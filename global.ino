@@ -34,6 +34,10 @@ Adafruit_MPU6050 mpu;
  */
 int state = 0;
 
+float xRot, yRot, zRot;
+float xAcc, yAcc, ZAcc;
+float temp;
+
 float latMov = 45.5058224, lonMov = 9.1628673;
 float latArd = 45.0502078, lonArd = 7.6674765;
 

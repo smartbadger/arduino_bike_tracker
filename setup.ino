@@ -107,18 +107,19 @@ void setupGyro(void) {
   delay(100);
 }
 
-
+/*
 void setupGSM() {
-  /* Initialize serial and wait up to 5 seconds for port to open */
+  // Initialize serial and wait up to 5 seconds for port to open 
   Serial.begin(9600);
   for(unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000); ) { }
 
-  /* This function takes care of connecting your sketch variables to the ArduinoIoTCloud object */
+  // This function takes care of connecting your sketch variables to the ArduinoIoTCloud object 
   initProperties();
 
-  /* Initialize Arduino IoT Cloud library */
+  // Initialize Arduino IoT Cloud library 
   ArduinoCloud.begin(ArduinoIoTPreferredConnection);
 
   setDebugMessageLevel(DBG_INFO);
   ArduinoCloud.printDebugInfo();
 }
+*/
