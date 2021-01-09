@@ -1,4 +1,4 @@
-void readGyro() {
+void readGyro(long elapsedTime) {
 
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
@@ -21,10 +21,12 @@ void readGyro() {
   Serial.print(g.gyro.z);
   Serial.println(" rad/s");
 
-  Serial.print("Temperature: ");
-  Serial.print(temp.temperature);
-  Serial.println(" degC");
+  Serial.println(sensorTemp);
+  sensorTemp = getTemperature(temp.temperature);
 
-  Serial.println("");
   delay(500);
+}
+
+String getTemperature(float temp) {
+  return "Temperature: " + String(temp) + " degC";
 }

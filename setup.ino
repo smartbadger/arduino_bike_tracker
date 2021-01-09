@@ -1,14 +1,13 @@
 void setup() {
   // put your setup code here, to run once:
     Serial.begin(115200);
+  while (!Serial)
+   delay(10); // will pause Zero, Leonardo, etc until serial console opens
   setupNFC();
   setupGyro();
 }
 
 void setupNFC(void) {
-  while (!Serial) delay(10); // for Leonardo/Micro/Zero
-
-  Serial.println("Hello!");
 
   nfc.begin();
 
@@ -28,14 +27,16 @@ void setupNFC(void) {
   Serial.println("Waiting for an ISO14443A Card ...");
 }
 
+
+
+
 void setupGyro(void) {
 
-  while (!Serial)
-    delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
-  Serial.println("Adafruit MPU6050 test!");
 
-  // Try to initialize!
+  Serial.println("Adafruit MPU6050 Setup");
+
+  // Try to initialize!`````
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
     while (1) {
@@ -110,7 +111,7 @@ void setupGyro(void) {
 /*
 void setupGSM() {
   // Initialize serial and wait up to 5 seconds for port to open 
-  Serial.begin(9600);
+
   for(unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000); ) { }
 
   // This function takes care of connecting your sketch variables to the ArduinoIoTCloud object 
