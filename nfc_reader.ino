@@ -1,20 +1,23 @@
 void nfcAuthentication(long elapsedTime) {
   static long nfcReadTime = 0; // interval to read nfc tag at
   int readInterval = 500;
-  static uint8_t success;
-  uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
-  uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
-  
 
   nfcReadTime += elapsedTime;
   if(nfcReadTime >= readInterval){
     // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
     // 'uid' will be populated with the UID, and uidLength will indicate
     // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
-    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
+    nfcReader();
     nfcReadTime -= readInterval;
   }
-  
+}
+
+
+bool nfcReader() {
+  uint8_t success;
+  uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
+  uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
   if (success) {
     // Display some basic information about the card
     Serial.println("Found an ISO14443A card");
@@ -59,7 +62,7 @@ void nfcAuthentication(long elapsedTime) {
           Serial.println("");
       
           // Wait a bit before reading the card again
-          delay(1000);
+          bikeState = 0;
         }
         else
         {
@@ -71,4 +74,6 @@ void nfcAuthentication(long elapsedTime) {
         Serial.println("Ooops ... authentication failed: Try another key?");
       }
     }
-  }}
+  }
+}
+  

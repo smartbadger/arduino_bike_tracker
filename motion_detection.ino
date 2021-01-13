@@ -1,4 +1,4 @@
-void readGyro(long elapsedTime) {
+void readGyro() {
 
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
@@ -23,10 +23,22 @@ void readGyro(long elapsedTime) {
 
   Serial.println(sensorTemp);
   sensorTemp = getTemperature(temp.temperature);
-
-  delay(500);
 }
 
 String getTemperature(float temp) {
   return "Temperature: " + String(temp) + " degC";
+}
+
+void motionDetection(long elapsedTime) {
+  static long sensorReadTime = 0; // interval to read nfc tag at
+  int readInterval = 1000;
+
+  sensorReadTime += elapsedTime;
+  if(sensorReadTime >= readInterval){
+    // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
+    // 'uid' will be populated with the UID, and uidLength will indicate
+    // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
+    readGyro();
+    sensorReadTime -= readInterval;
+  }
 }

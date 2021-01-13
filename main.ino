@@ -1,9 +1,11 @@
 void loop() {
   // get time elapsed, replaces delay() for 'hyper-threading' 
-  long elapsedTime = micros() - runningTime; 
+  long elapsedTime = millis() - runningTime; 
   runningTime += elapsedTime;
 
   // put your main code here, to run repeatedly:
-  nfcAuthentication(elapsedTime);
-  readGyro(elapsedTime);
+  if(bikeState >= 1) {
+    nfcAuthentication(elapsedTime);
+  }
+  motionDetection(elapsedTime);
 }

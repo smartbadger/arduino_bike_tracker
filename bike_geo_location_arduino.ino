@@ -45,4 +45,4 @@ float latArd = 45.0502078, lonArd = 7.6674765;
 float hueRed = 0.0, satRed = 100.0, briRed = 100.0;
 float hueGreen = 80.0, satGreen = 100.0, briGreen = 100.0;
 
-long runningTime = micros(); // time since startup to subtract for internal clock
+long runningTime = millis(); // time since startup to subtract for internal clock
