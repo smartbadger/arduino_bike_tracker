@@ -1,35 +1,49 @@
-void readGyro() {
+bool checkForMotion() {
 
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
+  float thresholdLevel = .5; // percentage increase or decrease
+  
+  float lastAccAvg = calculateAverage(xAcc, yAcc, zAcc);
+  float curAccAvg = calculateAverage(a.acceleration.x, a.acceleration.y, a.acceleration.z);
 
-  /* Print out the values */
-  Serial.print("Acceleration X: ");
-  Serial.print(a.acceleration.x);
-  Serial.print(", Y: ");
-  Serial.print(a.acceleration.y);
-  Serial.print(", Z: ");
-  Serial.print(a.acceleration.z);
-  Serial.println(" m/s^2");
+  float lastRotAvg = calculateAverage(xRot, yRot, zRot);
+  float curRotAvg = calculateAverage(g.gyro.x, g.gyro.y, g.gyro.z);
 
-  Serial.print("Rotation X: ");
-  Serial.print(g.gyro.x);
-  Serial.print(", Y: ");
-  Serial.print(g.gyro.y);
-  Serial.print(", Z: ");
-  Serial.print(g.gyro.z);
-  Serial.println(" rad/s");
+  // Set new datapoints
+  xRot = g.gyro.x;
+  yRot = g.gyro.y;
+  zRot = g.gyro.z;
+ 
+  xAcc = a.acceleration.x;
+  yAcc = a.acceleration.x;
+  zAcc = a.acceleration.x;
 
-  Serial.println(sensorTemp);
   sensorTemp = getTemperature(temp.temperature);
+  Serial.println(lastAccAvg);
+  Serial.println(curAccAvg);
+  bool trip = aboveThresholdValue(lastAccAvg, curAccAvg, thresholdLevel);
+  Serial.println(trip)
+  if( aboveThresholdValue(lastAccAvg, curAccAvg, thresholdLevel)|| aboveThresholdValue(lastRotAvg, curRotAvg, thresholdLevel)){
+    return true;
+  }
+  return false;
 }
 
 String getTemperature(float temp) {
   return "Temperature: " + String(temp) + " degC";
 }
 
-void motionDetection(long elapsedTime) {
+float calculateAverage(float x, float y, float z){
+  return (x+y+z)/3;
+}
+
+bool aboveThresholdValue (float original, float current, float threshold){
+  return abs((original - current)/original) >= threshold;
+}
+
+bool motionDetection(long elapsedTime) {
   static long sensorReadTime = 0; // interval to read nfc tag at
   int readInterval = 1000;
 
@@ -38,7 +52,7 @@ void motionDetection(long elapsedTime) {
     // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
     // 'uid' will be populated with the UID, and uidLength will indicate
     // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
-    readGyro();
     sensorReadTime -= readInterval;
+    return checkForMotion();
   }
 }

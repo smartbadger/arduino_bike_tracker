@@ -1,22 +1,25 @@
-void nfcAuthentication(long elapsedTime) {
+int nfcAuthentication(long elapsedTime) {
+  // todo failed attempts tracker
   static long nfcReadTime = 0; // interval to read nfc tag at
-  int readInterval = 500;
+  int readInterval = 2000;
 
   nfcReadTime += elapsedTime;
   if(nfcReadTime >= readInterval){
-    // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
-    // 'uid' will be populated with the UID, and uidLength will indicate
-    // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
-    nfcReader();
     nfcReadTime -= readInterval;
+    if(nfcIsAuthorized()){
+      return 0;
+    }
   }
+  return 1;
 }
 
 
-bool nfcReader() {
+bool nfcIsAuthorized() {
   uint8_t success;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
-  uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+  uint8_t uidLength;   
+  String tagId = "m6KbRFp9BWb75tNd";
+  String phoneId = "CLijCYyzUhPRZ3Mu";                     // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
   if (success) {
     // Display some basic information about the card
@@ -45,35 +48,29 @@ bool nfcReader() {
       {
         Serial.println("Sector 1 (Blocks 4..7) has been authenticated");
         uint8_t data[16];
-    
-        // If you want to write something to block 4 to test with, uncomment
-    // the following line and this text should be read back in a minute
-        //memcpy(data, (const uint8_t[]){ 'a', 'd', 'a', 'f', 'r', 'u', 'i', 't', '.', 'c', 'o', 'm', 0, 0, 0, 0 }, sizeof data);
-        // success = nfc.mifareclassic_WriteDataBlock (4, data);
-
         // Try to read the contents of block 4
         success = nfc.mifareclassic_ReadDataBlock(4, data);
-    
         if (success)
         {
-          // Data seems to have been read ... spit it out
-          Serial.println("Reading Block 4:");
-          nfc.PrintHexChar(data, 16);
-          Serial.println("");
-      
-          // Wait a bit before reading the card again
-          bikeState = 0;
+          String result = "";
+          for (uint8_t i = 0; i < 16; i++) {
+            result += (char)data[i];
+          }
+          Serial.println(result);
+          if (result == tagId)
+          {
+            Serial.println("tag found");
+            return true;
+          }
+
+          if(result == phoneId)
+          {
+            Serial.println("phone found");
+            return true;
+          }
         }
-        else
-        {
-          Serial.println("Ooops ... unable to read the requested block.  Try another key?");
-        }
-      }
-      else
-      {
-        Serial.println("Ooops ... authentication failed: Try another key?");
       }
     }
   }
+  return false;
 }
-  

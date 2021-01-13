@@ -36,7 +36,7 @@ Adafruit_MPU6050 mpu;
 int bikeState = 1;
 
 float xRot, yRot, zRot;
-float xAcc, yAcc, ZAcc;
+float xAcc, yAcc, zAcc;
 String sensorTemp;
 
 float latMov = 45.5058224, lonMov = 9.1628673;
