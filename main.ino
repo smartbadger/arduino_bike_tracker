@@ -5,7 +5,7 @@ void loop() {
 
   // put your main code here, to run repeatedly:
   if(bikeState >= 1) {
-    nfcAuthentication(elapsedTime);
+    bikeState = nfcAuthentication(elapsedTime);
   }
   motionDetection(elapsedTime);
 }
