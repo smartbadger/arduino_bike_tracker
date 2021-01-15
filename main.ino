@@ -10,8 +10,9 @@ void loop() {
     // check if bike is on, power up if not
   }
   bool motion = motionDetection(elapsedTime);
+
   if(motionTrigger == false && motion){
-    Serial.println('MOTION DETECTED');
+    Serial.println("MOTION DETECTED");
     // set some delay or action
     // security.triggeralarm()
   }

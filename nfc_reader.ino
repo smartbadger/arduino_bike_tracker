@@ -20,7 +20,7 @@ bool nfcIsAuthorized() {
   uint8_t uidLength;   
   String tagId = "m6KbRFp9BWb75tNd";
   String phoneId = "CLijCYyzUhPRZ3Mu";                     // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
-  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 500);
   if (success) {
     // Display some basic information about the card
     Serial.println("Found an ISO14443A card");

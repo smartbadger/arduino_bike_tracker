@@ -17,14 +17,11 @@ bool checkForMotion() {
   zRot = g.gyro.z;
  
   xAcc = a.acceleration.x;
-  yAcc = a.acceleration.x;
-  zAcc = a.acceleration.x;
+  yAcc = a.acceleration.y;
+  zAcc = a.acceleration.z;
 
   sensorTemp = getTemperature(temp.temperature);
-  Serial.println(lastAccAvg);
-  Serial.println(curAccAvg);
-  bool trip = aboveThresholdValue(lastAccAvg, curAccAvg, thresholdLevel);
-  Serial.println(trip)
+
   if( aboveThresholdValue(lastAccAvg, curAccAvg, thresholdLevel)|| aboveThresholdValue(lastRotAvg, curRotAvg, thresholdLevel)){
     return true;
   }
@@ -55,4 +52,5 @@ bool motionDetection(long elapsedTime) {
     sensorReadTime -= readInterval;
     return checkForMotion();
   }
+  return false;
 }
