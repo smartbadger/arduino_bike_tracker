@@ -7,7 +7,9 @@
 #include <ArduinoIoTCloud.h>
 #include <Arduino_ConnectionHandler.h>
 #include "secrets.h"
-
+// Include the GSM library
+#include <MKRGSM.h>
+#include <GSM.h>
 
 #define PN532_IRQ   (6)
 #define PN532_RESET (7)  // Not connected by default on the NFC Shield
@@ -20,7 +22,7 @@
 
 // TODO: define serial communication
 #define THING_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-#define BOARD_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#define BOARD_ID "615b3b99-01d6-4966-9daa-35a6a3c61a6e"
 
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 Adafruit_MPU6050 mpu;

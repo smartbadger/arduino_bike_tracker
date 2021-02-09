@@ -1,27 +1,27 @@
 {
     "configurations": [
         {
-            "name": "Mac",
+            "name": "Linux",
             "includePath": [
-                "/Users/connor/Library/Arduino15/packages/arduino/tools/**",
-                "/Users/connor/Documents/Arduino/libraries/**",
-                "/Applications/Arduino.app/Contents/Java/libraries/**",
-                "/Users/connor/Library/Arduino15/packages/arduino/hardware/samd/1.8.10/**"
+                "/home/connor/Arduino/**",
+                "/usr/include/**",
+                "/usr/local/include",
+                "${workspaceRoot}"
             ],
-            "forcedInclude": [
-                "/Users/connor/Library/Arduino15/packages/arduino/hardware/samd/1.8.10/cores/arduino/Arduino.h"
-            ],
+            "forcedInclude": [],
             "defines": [
                 "USBCON"
             ],
-            "macFrameworkPath": [
-                "/System/Library/Frameworks",
-                "/Library/Frameworks"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "compilerPath": "/usr/local/bin/gcc-10",
-            "cStandard": "gnu17",
-            "cppStandard": "gnu++14"
+            "browse": {
+                "path": [
+                    "/home/connor/Arduino/**",
+                    "/usr/include/**",
+                    "/usr/local/include",
+                    "${workspaceRoot}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
         }
     ],
     "version": 4
