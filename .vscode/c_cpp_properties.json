@@ -3,15 +3,19 @@
         {
             "name": "Linux",
             "includePath": [
+                "/home/connor/.arduino15/packages/arduino/tools/**",
+                "/home/connor/Arduino/libraries/**",
+                "/home/connor/Downloads/arduino-1.8.13/libraries/**",
+                "/home/connor/.arduino15/packages/arduino/hardware/samd/1.8.11/**",
                 "/home/connor/Arduino/**",
                 "/usr/include/**",
                 "/usr/local/include",
                 "${workspaceRoot}"
             ],
-            "forcedInclude": [],
-            "defines": [
-                "USBCON"
+            "forcedInclude": [
+                "/home/connor/.arduino15/packages/arduino/hardware/samd/1.8.11/cores/arduino/Arduino.h"
             ],
+            "defines": [],
             "browse": {
                 "path": [
                     "/home/connor/Arduino/**",
