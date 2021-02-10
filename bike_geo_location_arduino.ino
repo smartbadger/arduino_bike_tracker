@@ -7,7 +7,6 @@
 #include <ArduinoIoTCloud.h>
 #include <Arduino_ConnectionHandler.h>
 #include "secrets.h"
-// Include the GSM library
 #include <MKRGSM.h>
 #include <GSM.h>
 
@@ -27,6 +26,10 @@
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 Adafruit_MPU6050 mpu;
 
+
+#define sfPrint(x) Serial.println(F(x)); // to disable debugging comment
+// #define sfPrint(x); // to disable debugging uncomment
+
 /* 
  *  0 = ready / unlocked
  *  1 = locked 
@@ -35,6 +38,7 @@ Adafruit_MPU6050 mpu;
  *  4 = active low power
  *  
  */
+
 int bikeState = 1;
 
 float xRot, yRot, zRot;
