@@ -6,6 +6,9 @@ int nfcAuthentication(long elapsedTime) {
   nfcReadTime += elapsedTime;
   if(nfcReadTime >= readInterval){
     nfcReadTime -= readInterval;
+    if(!nfcReady){
+      setupNFC();
+    }
     if(nfcIsAuthorized()){
       return 0;
     }
@@ -83,9 +86,7 @@ void setupNFC(void) {
   if (! versiondata) {
     Serial.print("Didn't find PN53x board");
     // set variable to false
-    while (1){
-      delay(10);
-    }
+    return;
   }
 
   // Got ok data, print it out!
@@ -96,4 +97,6 @@ void setupNFC(void) {
   // configure board to read RFID tags
   nfc.SAMConfig();
   Serial.println("Waiting for an ISO14443A Card ...");
+  nfcReady = true;
+  
 }

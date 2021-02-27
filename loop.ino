@@ -16,12 +16,13 @@ void loop() {
     // set some delay or action
     // security.triggeralarm()
   }
+  motionTrigger = motion;
   
   //GPS location ping
   //recive gsm commands
   //check battery power
-  //
-  motionTrigger = motion;
-  modemT();
-  sendGSM();
+
+  //modemT(elapsedTime);
+  //sendPing(elapsedTime);
+  // sendGSM(elapsedTime);
 }

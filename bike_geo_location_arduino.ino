@@ -6,9 +6,10 @@
 #include <Adafruit_Sensor.h>
 #include <ArduinoIoTCloud.h>
 #include <Arduino_ConnectionHandler.h>
-#include "secrets.h"
 #include <MKRGSM.h>
 #include <GSM.h>
+#include "secrets.h"
+#include <Async_Operations.h>
 
 #define PN532_IRQ   (6)
 #define PN532_RESET (7)  // Not connected by default on the NFC Shield
@@ -25,7 +26,6 @@
 
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 Adafruit_MPU6050 mpu;
-
 
 #define sfPrint(x) Serial.println(F(x)); // to disable debugging comment
 // #define sfPrint(x); // to disable debugging uncomment
@@ -52,3 +52,11 @@ float hueRed = 0.0, satRed = 100.0, briRed = 100.0;
 float hueGreen = 80.0, satGreen = 100.0, briGreen = 100.0;
 
 long runningTime = millis(); // time since startup to subtract for internal clock
+
+bool debug = true; // set to false for production
+
+// Module initialization state
+bool motionReady = false;
+bool nfcReady = false; 
+bool gsmReady = false; 
+bool controllerReady = false;

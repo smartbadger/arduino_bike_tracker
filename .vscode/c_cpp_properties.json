@@ -9,12 +9,16 @@
                 "/home/connor/Arduino/**",
                 "/usr/include/**",
                 "/usr/local/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "/home/connor/Downloads/arduino-1.8.13/libraries/**",
+                "/home/connor/arduino/libraries/**"
             ],
             "forcedInclude": [
                 "/home/connor/.arduino15/packages/arduino/hardware/samd/1.8.11/cores/arduino/Arduino.h"
             ],
-            "defines": [],
+            "defines": [
+                "USBCON"
+            ],
             "browse": {
                 "path": [
                     "/home/connor/.arduino15/packages/arduino/tools/**",

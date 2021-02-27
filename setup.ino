@@ -1,13 +1,19 @@
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
-  Serial.begin(115200);
-  while (!Serial)
-   delay(10); // will pause Zero, Leonardo, etc until serial console opens
-  
+  if (debug == true)
+  {
+    Serial.begin(115200);
+    while (!Serial)
+      delay(10); // will pause Zero, Leonardo, etc until serial console opens
+  }
+
   setupNFC();
   setupGyro();
   setupGSM();
 }
+
+
 
 
 
