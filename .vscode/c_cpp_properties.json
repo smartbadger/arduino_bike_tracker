@@ -1,27 +1,37 @@
 {
     "configurations": [
         {
-            "name": "Mac",
+            "name": "Linux",
             "includePath": [
-                "/Users/connor/Library/Arduino15/packages/arduino/tools/**",
-                "/Users/connor/Documents/Arduino/libraries/**",
-                "/Applications/Arduino.app/Contents/Java/libraries/**",
-                "/Users/connor/Library/Arduino15/packages/arduino/hardware/samd/1.8.10/**"
+                "/home/connor/.arduino15/packages/arduino/tools/**",
+                "/home/connor/Arduino/libraries/**",
+                "/home/connor/.arduino15/packages/arduino/hardware/samd/1.8.11/**",
+                "/home/connor/Arduino/**",
+                "/usr/include/**",
+                "/usr/local/include",
+                "${workspaceRoot}",
+                "/home/connor/Downloads/arduino-1.8.13/libraries/**",
+                "/home/connor/arduino/libraries/**"
             ],
             "forcedInclude": [
-                "/Users/connor/Library/Arduino15/packages/arduino/hardware/samd/1.8.10/cores/arduino/Arduino.h"
+                "/home/connor/.arduino15/packages/arduino/hardware/samd/1.8.11/cores/arduino/Arduino.h"
             ],
             "defines": [
                 "USBCON"
             ],
-            "macFrameworkPath": [
-                "/System/Library/Frameworks",
-                "/Library/Frameworks"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "compilerPath": "/usr/local/bin/gcc-10",
-            "cStandard": "gnu17",
-            "cppStandard": "gnu++14"
+            "browse": {
+                "path": [
+                    "/home/connor/.arduino15/packages/arduino/tools/**",
+                    "/home/connor/Arduino/libraries/**",
+                    "/home/connor/.arduino15/packages/arduino/hardware/samd/1.8.11/**",
+                    "/home/connor/Arduino/**",
+                    "/usr/include/**",
+                    "/usr/local/include",
+                    "${workspaceRoot}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
         }
     ],
     "version": 4

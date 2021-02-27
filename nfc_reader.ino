@@ -6,6 +6,9 @@ int nfcAuthentication(long elapsedTime) {
   nfcReadTime += elapsedTime;
   if(nfcReadTime >= readInterval){
     nfcReadTime -= readInterval;
+    if(!nfcReady){
+      setupNFC();
+    }
     if(nfcIsAuthorized()){
       return 0;
     }
@@ -73,4 +76,27 @@ bool nfcIsAuthorized() {
     }
   }
   return false;
+}
+
+void setupNFC(void) {
+ Serial.println("PN53x Setup");
+  nfc.begin();
+
+  uint32_t versiondata = nfc.getFirmwareVersion();
+  if (! versiondata) {
+    Serial.print("Didn't find PN53x board");
+    // set variable to false
+    return;
+  }
+
+  // Got ok data, print it out!
+  Serial.print("Found chip PN5"); Serial.println((versiondata>>24) & 0xFF, HEX); 
+  Serial.print("Firmware ver. "); Serial.print((versiondata>>16) & 0xFF, DEC); 
+  Serial.print('.'); Serial.println((versiondata>>8) & 0xFF, DEC);
+  
+  // configure board to read RFID tags
+  nfc.SAMConfig();
+  Serial.println("Waiting for an ISO14443A Card ...");
+  nfcReady = true;
+  
 }

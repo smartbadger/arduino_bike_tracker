@@ -1,5 +1,5 @@
 {
-    "port": "/dev/tty.usbmodem144301",
+    "port": "/dev/ttyACM0",
     "board": "arduino:samd:mkrgsm1400",
     "sketch": "bike_geo_location_arduino.ino"
 }

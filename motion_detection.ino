@@ -1,10 +1,11 @@
-bool checkForMotion() {
+bool checkForMotion()
+{
 
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
   float thresholdLevel = .5; // percentage increase or decrease
-  
+
   float lastAccAvg = calculateAverage(xAcc, yAcc, zAcc);
   float curAccAvg = calculateAverage(a.acceleration.x, a.acceleration.y, a.acceleration.z);
 
@@ -15,42 +16,69 @@ bool checkForMotion() {
   xRot = g.gyro.x;
   yRot = g.gyro.y;
   zRot = g.gyro.z;
- 
+
   xAcc = a.acceleration.x;
   yAcc = a.acceleration.y;
   zAcc = a.acceleration.z;
 
   sensorTemp = getTemperature(temp.temperature);
 
-  if( aboveThresholdValue(lastAccAvg, curAccAvg, thresholdLevel)|| aboveThresholdValue(lastRotAvg, curRotAvg, thresholdLevel)){
+  if (aboveThresholdValue(lastAccAvg, curAccAvg, thresholdLevel) || aboveThresholdValue(lastRotAvg, curRotAvg, thresholdLevel))
+  {
     return true;
   }
   return false;
 }
 
-String getTemperature(float temp) {
+String getTemperature(float temp)
+{
   return "Temperature: " + String(temp) + " degC";
 }
 
-float calculateAverage(float x, float y, float z){
-  return (x+y+z)/3;
+float calculateAverage(float x, float y, float z)
+{
+  return (x + y + z) / 3;
 }
 
-bool aboveThresholdValue (float original, float current, float threshold){
-  return abs((original - current)/original) >= threshold;
+bool aboveThresholdValue(float original, float current, float threshold)
+{
+  return abs((original - current) / original) >= threshold;
 }
 
-bool motionDetection(long elapsedTime) {
+// check for motion if the module is available otherwise try to ping it
+bool motionDetection(long elapsedTime)
+{
   static long sensorReadTime = 0; // interval to read nfc tag at
   int readInterval = 1000;
 
   sensorReadTime += elapsedTime;
-  if(sensorReadTime >= readInterval){
+  if (sensorReadTime >= readInterval)
+  {
     // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
     // 'uid' will be populated with the UID, and uidLength will indicate
     // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
     sensorReadTime -= readInterval;
+    if(!motionReady){
+      sfPrint("Motion not ready, try to setup device");
+    }
     return checkForMotion();
   }
   return false;
+}
+
+void setupGyro(void)
+{
+    sfPrint("MPU6050 Setup");
+    // Try to initialize!
+    if (!mpu.begin())
+    {
+      sfPrint("Failed to find MPU6050 chip");
+      return;
+    }
+    sfPrint("MPU6050 Found!");
+    mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+    mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+    mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+    motionReady = true;
+  
 }
