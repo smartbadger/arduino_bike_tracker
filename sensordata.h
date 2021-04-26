@@ -1,9 +1,9 @@
 #include "coordinate.h"
 
-#ifndef _SAMPLE_H
-#define _SAMPLE_H
+#ifndef _SensorData_H
+#define _SensorData_H
 
-struct Sample {
+struct SensorData {
     float temp;
     Coord rotation;
     Coord acceleration;

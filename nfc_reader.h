@@ -1,3 +1,6 @@
+#ifndef _NFC_H
+#define _NFC_H
+
 #include <Adafruit_PN532.h>
 
 class NfcReader
@@ -10,24 +13,16 @@ public:
   {
     _nfcReady = false;
   }
- 
-  bool nfcAuthentication(long elapsedTime)
-  {
-    // todo failed attempts tracker
-    static long nfcReadTime = 0; // interval to read nfc tag at
-    int readInterval = 3000;
 
-    nfcReadTime += elapsedTime;
-    if (nfcReadTime >= readInterval)
+  bool nfcAuthentication()
+  {
+
+    if (!_nfcReady)
     {
-      nfcReadTime -= readInterval;
-      if (!_nfcReady)
-      {
-        setupNFC();
-      }
-      return nfcIsAuthorized();
+      setupNFC();
+      return false;
     }
-    return false;
+    return nfcIsAuthorized();
   }
 
   // NFC READER AUTHORIZATION
@@ -121,3 +116,5 @@ public:
     _nfcReady = true;
   }
 };
+
+#endif

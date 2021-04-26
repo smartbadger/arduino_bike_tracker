@@ -10,12 +10,17 @@
 #include "secrets.h"
 #include "bike.h"
 #include "nfc_reader.h"
-#include "sensor.h"
-#include "sample.h"
+#include "sensordata.h"
+#include "Async_Operations.h"
+#include "indicator.h"
+#include "timer.h"
 
 #define PN532_IRQ (6)
 #define PN532_RESET (7) // Not connected by default on the NFC Shield
 
+// #define blueLed (5)
+// #define greenLed (4)
+// #define redLed (3)
 #define blueLed (5)
 #define greenLed (4)
 #define redLed (3)
@@ -26,32 +31,21 @@
 #define THING_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 #define BOARD_ID "615b3b99-01d6-4966-9daa-35a6a3c61a6e"
 
-#define sfPrint(x) Serial.println(F(x)); // to disable debugging comment
 // #define sfPrint(x); // to disable debugging uncomment
 
-long runningTime = millis(); // time since startup to subtract for internal clock
-bool debug = true;           // set to false for production
+bool debug = true; // set to false for production
+
+
+long long dtt = {250};
+Async_Operations dauth(&dtt, 1, -1);
 
 // setup bike class
+Sensor sensor = Sensor();
 NfcReader nfc = NfcReader(PN532_IRQ, PN532_RESET);
-Sensor sen = Sensor();
-Bike bike = Bike();
+Indicator status = Indicator(greenLed, blueLed, redLed, alarm);
+Bike bike = Bike(sensor);
+
 // GsmModule gsm = GSM();
-
-bool aboveThresholdValue(float original, float current, float threshold)
-{
-  return abs((original - current) / original) >= threshold;
-}
-
-bool checkForMotion(Sample current, Sample previous)
-{
-  float t = 0.5;
-  float cr = current.rotation.calculateAverage();
-  float pr = previous.rotation.calculateAverage();
-  float ca = current.acceleration.calculateAverage();
-  float pa = previous.acceleration.calculateAverage();
-  return aboveThresholdValue(cr, pr, t) || aboveThresholdValue(ca, pa, t);
-}
 
 void setup()
 {
@@ -61,19 +55,14 @@ void setup()
     while (!Serial)
       delay(10); // will pause Zero, Leonardo, etc until serial console opens
   }
-
+  bike.setup();
   nfc.setupNFC();
-  sen.setup();
+  dauth.start();
 }
 
-void loop()
+void readNFC()
 {
-  // get time elapsed, replaces delay() for 'hyper-threading'
-  long elapsedTime = millis() - runningTime;
-  static bool motionTrigger = false;
-  runningTime += elapsedTime;
-
-  bool auth = nfc.nfcAuthentication(runningTime);
+  bool auth = nfc.nfcAuthentication();
   bool locked = bike.isLocked();
   // put your main code here, to run repeatedly:
   if (locked && auth)
@@ -86,8 +75,8 @@ void loop()
     bike.setLock(true);
     Serial.println("set locked");
   }
-  Sample s = sen.readSensor(elapsedTime);
-  bool motion = checkForMotion(bike.getSample(), s);
-  bike.setSample(s);
-  
+}
+
+void loop()
+{
 }

@@ -1,8 +1,9 @@
+#ifndef _SENSOR_H
+#define _SENSOR_H
+
 #include <Adafruit_MPU6050.h>
 #include "coordinate.h"
-#include "sample.h"
-#define sfPrint(x) Serial.println(F(x));
-
+#include "sensordata.h"
 class Sensor
 {
   Adafruit_MPU6050 _mpu;
@@ -13,30 +14,26 @@ public:
   {
     _ready = false;
   }
-  void setup(void)
+  void setup()
   {
-    sfPrint("MPU6050 Setup");
+    Serial.println("MPU6050 Setup");
     // Try to initialize!
     if (!_mpu.begin())
     {
-      sfPrint("Failed to find MPU6050 chip");
+      Serial.println("Failed to find MPU6050 chip");
       return;
     }
-    sfPrint("MPU6050 Found!");
+    Serial.println("MPU6050 Found!");
     _mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
     _mpu.setGyroRange(MPU6050_RANGE_500_DEG);
     _mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
     _ready = true;
   }
 
-  Sample readSensor(long elapsedTime)
+  SensorData readSensor()
   {
-    Sample current;
-    static long sensorReadTime = 0; // interval to read nfc tag at
-    int readInterval = 1000;
-
-    sensorReadTime += elapsedTime;
-    if (sensorReadTime >= readInterval && _ready)
+    SensorData current;
+    if (_ready)
     {
       /* Get new sensor events with the readings */
       sensors_event_t a, g, temp;
@@ -46,7 +43,8 @@ public:
       current.rotation = Coord(g.gyro.x, g.gyro.y, g.gyro.z);
       current.temp = temp.temperature;
     }
-
     return current;
   }
 };
+
+#endif
