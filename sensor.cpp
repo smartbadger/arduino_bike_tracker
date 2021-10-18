@@ -1,7 +1,4 @@
-#ifndef SENSOR_H
-#define SENSOR_H
-
-#include <Adafruit_MPU6050.h>
+#include "sensor.h"
 #include "coordinate.h"
 #include "sensordata.h"
 
@@ -47,5 +44,3 @@ public:
     return current;
   }
 };
-
-#endif

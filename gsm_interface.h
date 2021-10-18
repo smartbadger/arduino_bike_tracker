@@ -14,6 +14,12 @@ class GSMInterface
 	    void ready();
 	    void loop();
         void setup();
+        // originally in while loop with break
+	    // This function use the location's APIs to get the device coordinates and update the globa variable if all the requirement are satisfied
+	    Location measureLocation();
+		//send json data to endpoint
+    	void sendData();
+
 
 	private:
         enum State
@@ -38,18 +44,10 @@ class GSMInterface
         void connect();
 
         void setExpired(boolean value);
-        // originally in while loop with break
-	    // This function use the location's APIs to get the device coordinates and update the globa variable if all the requirement are satisfied
-	    Location measureLocation();
 
 	    //The connectNetwork() function is used for the board data connection
         // originally in while loop with break
 	    void connectNetwork();
-	
-
-	    //code section used to initialize data connection and localization object
-		//send json data to endpoint
-    	void sendData();
 
         // originally in while loop with break
 	    void sendText(Location value);

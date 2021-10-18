@@ -20,7 +20,7 @@ GSMInterface::~GSMInterface(){
 }
 
 void GSMInterface::setup() {
-
+	Serial.println("Setting up GSM Interface");
 }
 
 void GSMInterface::ready() {
