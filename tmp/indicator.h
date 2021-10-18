@@ -2,6 +2,8 @@
 #ifndef _INDICATOR_H
 #define _INDICATOR_H
 
+#include <GSM.h>
+
 class Indicator
 {
   int _redLED;

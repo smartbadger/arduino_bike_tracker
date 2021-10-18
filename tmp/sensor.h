@@ -1,9 +1,10 @@
-#ifndef _SENSOR_H
-#define _SENSOR_H
+#ifndef SENSOR_H
+#define SENSOR_H
 
 #include <Adafruit_MPU6050.h>
 #include "coordinate.h"
 #include "sensordata.h"
+
 class Sensor
 {
   Adafruit_MPU6050 _mpu;
