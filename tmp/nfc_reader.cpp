@@ -1,36 +1,40 @@
-#ifndef _NFC_H
-#define _NFC_H
+#include "nfc_reader.h"
 
 
-#include <Adafruit_PN532.h>
-
-class NfcReader
-{
-  bool _nfcReady;
-  Adafruit_PN532 _nfc;
-
-public:
-  NfcReader(int PN532_IRQ, int PN532_RESET) : _nfc(PN532_IRQ, PN532_RESET)
-  {
+NfcReader::NfcReader(int PN532_IRQ, int PN532_RESET){
     _nfcReady = false;
-  }
+}
+NfcReader::~NfcReader(){
+ // destroy ?    
+}
+void NfcReader::setup(){
+Serial.println("PN53x Setup");
+    _nfc.begin();
 
-  bool nfcAuthentication()
-  {
-
-    if (!_nfcReady)
+    uint32_t versiondata = _nfc.getFirmwareVersion();
+    if (!versiondata)
     {
-      setupNFC();
-      return false;
+      Serial.print("Didn't find PN53x board");
+      // set variable to false
+      return;
     }
-    return nfcIsAuthorized();
-  }
 
-  // NFC READER AUTHORIZATION
-  //=================================
-  bool nfcIsAuthorized()
-  {
-    uint8_t success;
+    // Got ok data, print it out!
+    Serial.print("Found chip PN5");
+    Serial.println((versiondata >> 24) & 0xFF, HEX);
+    Serial.print("Firmware ver. ");
+    Serial.print((versiondata >> 16) & 0xFF, DEC);
+    Serial.print('.');
+    Serial.println((versiondata >> 8) & 0xFF, DEC);
+
+    // configure board to read RFID tags
+    _nfc.SAMConfig();
+    Serial.println("Waiting for an ISO14443A Card ...");
+    _nfcReady = true;
+}
+
+bool NfcReader::nfcIsAuthorized(){
+ uint8_t success;
     uint8_t uid[] = {0, 0, 0, 0, 0, 0, 0}; // Buffer to store the returned UID
     uint8_t uidLength;
     String tagId = "m6KbRFp9BWb75tNd";
@@ -86,36 +90,4 @@ public:
       }
     }
     return false;
-  }
-
-  // SETUP NFC
-  //=================================
-  void setupNFC(void)
-  {
-    Serial.println("PN53x Setup");
-    _nfc.begin();
-
-    uint32_t versiondata = _nfc.getFirmwareVersion();
-    if (!versiondata)
-    {
-      Serial.print("Didn't find PN53x board");
-      // set variable to false
-      return;
-    }
-
-    // Got ok data, print it out!
-    Serial.print("Found chip PN5");
-    Serial.println((versiondata >> 24) & 0xFF, HEX);
-    Serial.print("Firmware ver. ");
-    Serial.print((versiondata >> 16) & 0xFF, DEC);
-    Serial.print('.');
-    Serial.println((versiondata >> 8) & 0xFF, DEC);
-
-    // configure board to read RFID tags
-    _nfc.SAMConfig();
-    Serial.println("Waiting for an ISO14443A Card ...");
-    _nfcReady = true;
-  }
-};
-
-#endif
+}

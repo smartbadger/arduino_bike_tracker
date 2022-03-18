@@ -4,7 +4,8 @@
 #include <MKRGSM.h>
 #include "ArduinoLowPower.h"
 #include "location.h"
-
+#ifndef _GSM_H
+#define _GSM_H
 class GSMInterface
 {
 
@@ -12,14 +13,13 @@ class GSMInterface
 		GSMInterface(long timeout);
         ~GSMInterface();
 	    void ready();
-	    void loop();
+	    void doNetworkStuff();
         void setup();
         // originally in while loop with break
-	    // This function use the location's APIs to get the device coordinates and update the globa variable if all the requirement are satisfied
+	    // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied
 	    Location measureLocation();
 		//send json data to endpoint
     	void sendData();
-
 
 	private:
         enum State

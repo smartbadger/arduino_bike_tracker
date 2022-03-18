@@ -27,7 +27,7 @@ void GSMInterface::ready() {
 	_targetState = _currentState;
 }
 
-void GSMInterface::loop()
+void GSMInterface::doNetworkStuff()
 {
 	if (_targetState == DISCONNECTED)
 
@@ -72,7 +72,7 @@ void GSMInterface::connect()
 }
 
 // originally in while loop with break
-// This function use the location's APIs to get the device coordinates and update the globa variable if all the requirement are satisfied
+// This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied
 Location GSMInterface::measureLocation()
 {
 	if (gsmlocation.available() && gsmlocation.accuracy() < 300 && gsmlocation.accuracy() != 0)
@@ -80,9 +80,9 @@ Location GSMInterface::measureLocation()
 		return Location
 		{
 			gsmlocation.latitude(),
-				gsmlocation.longitude(),
-				gsmlocation.altitude(),
-				gsmlocation.accuracy()
+			gsmlocation.longitude(),
+			gsmlocation.altitude(),
+			gsmlocation.accuracy()
 		};
 	}
 	
@@ -106,11 +106,11 @@ void GSMInterface::connectNetwork()
 	while ( _currentState == DISCONNECTED || millis() - start < _timeout)
 	{
 
-		Serial.println("failed to connect");
+		Serial.println("GSM: failed to connect");
 		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY) &(gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY))
 		{
 			_currentState = READY;
-			Serial.println("success");
+			Serial.println("GSM: connected to the network");
 			ready();
 		}
 
