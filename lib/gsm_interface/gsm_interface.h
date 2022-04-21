@@ -1,9 +1,6 @@
-#ifndef GSM_INTERFACE_H
-#define GSM_INTERFACE_H
-
 #include <MKRGSM.h>
-#include "ArduinoLowPower.h"
 #include "location.h"
+
 #ifndef _GSM_H
 #define _GSM_H
 class GSMInterface

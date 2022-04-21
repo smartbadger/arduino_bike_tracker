@@ -1,5 +1,11 @@
+// #include "debug.h"
 #include "gsm_interface.h"
-#include "secrets.h"
+  #define SECRET_PIN ""
+  #define SECRET_APN "prepay.pelion"
+  #define SECRET_LOGIN "arduino"
+  #define SECRET_PASS "arduino"
+  #define SECRET_TAGID ""
+  #define SECRET_PHONEID ""
 
 static const char *_PINNUMBER = SECRET_PIN;
 static const char *_GPRS_APN = SECRET_APN;
@@ -12,7 +18,6 @@ GSMInterface::GSMInterface(long timeout) {
 	_timeout = timeout;
 	_connected = false;
 	_expired = false;
-
 }
 
 GSMInterface::~GSMInterface(){
@@ -30,13 +35,12 @@ void GSMInterface::ready() {
 void GSMInterface::doNetworkStuff()
 {
 	if (_targetState == DISCONNECTED)
-
 	{
 		goToReady();
 	}
 	else if (_targetState == READY)
 	{
-		goToReady();
+		measureLocation();
 	}
 	else if (_targetState == SEND_STATUS)
 	{
@@ -65,18 +69,13 @@ void GSMInterface::goToReady() {
     }
 }
 
-void GSMInterface::connect()
-{
-	connectNetwork();
-	gsmlocation.begin();
-}
-
 // originally in while loop with break
 // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied
 Location GSMInterface::measureLocation()
 {
-	if (gsmlocation.available() && gsmlocation.accuracy() < 300 && gsmlocation.accuracy() != 0)
+	if (gsmlocation.available() && gsmlocation.accuracy() != 0)
 	{
+        		Serial.println("location available");
 		return Location
 		{
 			gsmlocation.latitude(),
@@ -105,7 +104,6 @@ void GSMInterface::connectNetwork()
 	// Start GSM connection
 	while ( _currentState == DISCONNECTED || millis() - start < _timeout)
 	{
-
 		Serial.println("GSM: failed to connect");
 		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY) &(gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY))
 		{
