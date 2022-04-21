@@ -1,8 +1,11 @@
-#include <MKRGSM.h>
-#include "location.h"
+#pragma once 
 
 #ifndef _GSM_H
 #define _GSM_H
+
+#include <MKRGSM.h>
+#include "location.h"
+
 class GSMInterface
 {
 

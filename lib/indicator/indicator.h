@@ -1,4 +1,5 @@
 
+#pragma once
 #ifndef _INDICATOR_H
 #define _INDICATOR_H
 

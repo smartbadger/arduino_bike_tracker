@@ -1,11 +1,6 @@
-// #include "debug.h"
 #include "gsm_interface.h"
-  #define SECRET_PIN ""
-  #define SECRET_APN "prepay.pelion"
-  #define SECRET_LOGIN "arduino"
-  #define SECRET_PASS "arduino"
-  #define SECRET_TAGID ""
-  #define SECRET_PHONEID ""
+#include "debugger.h"
+#include "secrets.h"
 
 static const char *_PINNUMBER = SECRET_PIN;
 static const char *_GPRS_APN = SECRET_APN;
@@ -25,7 +20,7 @@ GSMInterface::~GSMInterface(){
 }
 
 void GSMInterface::setup() {
-	Serial.println("Setting up GSM Interface");
+	debuglnV("Setting up GSM Interface");
 }
 
 void GSMInterface::ready() {
@@ -49,11 +44,11 @@ void GSMInterface::doNetworkStuff()
 	
 }
 void GSMInterface::goToSend(){
-	Serial.println("try to send");
+	debuglnV("try to send");
 }
 
 void GSMInterface::goToDisconnected() {
-	Serial.println("disconnect");
+	debuglnV("disconnect");
 }
 
 void GSMInterface::goToReady() {
@@ -64,7 +59,7 @@ void GSMInterface::goToReady() {
       break;
 
     case SEND_STATUS:
-      Serial.println("sending status");
+      debuglnV("sending status");
       break;
     }
 }
@@ -75,7 +70,7 @@ Location GSMInterface::measureLocation()
 {
 	if (gsmlocation.available() && gsmlocation.accuracy() != 0)
 	{
-        		Serial.println("location available");
+        		debuglnV("location available");
 		return Location
 		{
 			gsmlocation.latitude(),
@@ -86,7 +81,7 @@ Location GSMInterface::measureLocation()
 	}
 	
 		// negative accuracy means invalid
-		Serial.println("location not available");
+		debuglnV("location not available");
 		return Location
 		{ 0, 0, 0, -1 };
 	
@@ -104,11 +99,11 @@ void GSMInterface::connectNetwork()
 	// Start GSM connection
 	while ( _currentState == DISCONNECTED || millis() - start < _timeout)
 	{
-		Serial.println("GSM: failed to connect");
+		debuglnV("GSM: failed to connect");
 		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY) &(gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY))
 		{
 			_currentState = READY;
-			Serial.println("GSM: connected to the network");
+			debuglnV("GSM: connected to the network");
 			ready();
 		}
 

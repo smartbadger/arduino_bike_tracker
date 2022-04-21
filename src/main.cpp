@@ -1,10 +1,11 @@
 #include <Arduino.h>
+#include "debugger.h"
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_Sensor.h>
-// #include "indicator.h"
-// #include "nfcreader.h"
-// #include "sensor.h"
+#include "indicator.h"
+#include "nfcreader.h"
+#include "sensor.h"
 #include "gsm_interface.h"
 #include "secrets.h"
 
@@ -18,10 +19,10 @@
 // TODO: define serial communication
 
 int count = 0;
-// Indicator i = Indicator(greenLed, blueLed, redLed);
-// NfcReader nfc = NfcReader(PN532_IRQ, PN532_RESET, RFID_KEY);
-// Sensor s = Sensor();
-// sensors_event_t a, g,temp;
+Indicator i = Indicator(greenLed, blueLed, redLed);
+NfcReader nfc = NfcReader(PN532_IRQ, PN532_RESET, RFID_KEY);
+Sensor s = Sensor();
+sensors_event_t a, g,temp;
 GSMInterface gsmi = GSMInterface(20000);
 void setup() {
   // put your setup code here, to run once:
@@ -30,19 +31,19 @@ void setup() {
     while (!Serial)
       delay(10); // will pause Zero, Leonardo, etc until serial console opens
   }
-  // s.setup();
-  // nfc.setup();
+  s.setup();
+  nfc.setup();
   gsmi.setup();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // i.setState(count);
-  // i.process();
-  // if(nfc.isAuthorized()){
-  //   Serial.println("auth");
-  // };
-  // s.readSensor(a, g, temp);
+  i.setState(count);
+  i.process();
+  if(nfc.isAuthorized()){
+    Serial.println("auth");
+  };
+  s.readSensor(a, g, temp);
   gsmi.doNetworkStuff();
   delay(2000);
   count++;

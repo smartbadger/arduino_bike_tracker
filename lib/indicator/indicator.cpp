@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "debug.h"
+#include "debugger.h"
 #include "indicator.h"
 
 Indicator::Indicator(int greenLED, int blueLED, int redLED)

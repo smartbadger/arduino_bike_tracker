@@ -1,7 +1,7 @@
 
 #include <Wire.h>
 #include "sensor.h"
-#include "debug.h"
+#include "debugger.h"
 
 Adafruit_MPU6050 _mpu;
 

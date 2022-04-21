@@ -1,8 +1,10 @@
+#pragma once 
 #ifndef _SENSOR_H
 #define _SENSOR_H
 
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
+
 
 class Sensor
 {

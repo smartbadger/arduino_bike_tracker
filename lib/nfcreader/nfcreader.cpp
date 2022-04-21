@@ -1,6 +1,6 @@
 #include <Adafruit_PN532.h>
 #include "nfcreader.h"
-#include "debug.h"
+#include "debugger.h"
 
 NfcReader::NfcReader(int PN532_IRQ, int PN532_RESET, const char *key):_nfc(PN532_IRQ, PN532_RESET)
 {
