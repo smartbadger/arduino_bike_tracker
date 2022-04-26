@@ -8,18 +8,21 @@ class Indicator
   int _redLED;
   int _greenLED;
   int _blueLED;
+  int _alarm;
+  int _blink;
   
   enum State
   {
     INIT,
     LOCKED,
     UNLOCKED,
-    ALARM
+    ALARM,
+    BUSY
   };
 
   State _currentState;
 public:
-  Indicator(int greenLED, int blueLED, int redLED);
+  Indicator(int blink, int greenLED, int blueLED, int redLED, int alarm);
 
   void setState(int state);
 
@@ -29,6 +32,7 @@ private:
   void green();
   void blue();
   void red();
+  void blink();
   void off();
 };
 

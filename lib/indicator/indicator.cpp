@@ -2,16 +2,20 @@
 #include "debugger.h"
 #include "indicator.h"
 
-Indicator::Indicator(int greenLED, int blueLED, int redLED)
+Indicator::Indicator(int blink, int greenLED, int blueLED, int redLED, int alarm)
 {
   _greenLED = greenLED;
   _blueLED = blueLED;
   _redLED = redLED;
+  _alarm = alarm;
+  _blink = blink;
   _currentState = State::INIT;
   
   pinMode(_greenLED, OUTPUT);
   pinMode(_blueLED, OUTPUT);
   pinMode(_redLED, OUTPUT);
+  pinMode(_alarm, OUTPUT);
+  pinMode(_blink, OUTPUT);
   off();
   process();
 }
@@ -30,6 +34,9 @@ void Indicator::setState(int state){
       case 3:
           _currentState = State::ALARM;
           break;
+      case 4:
+          _currentState = State::BUSY;
+          break;
       default:
           debuglnE("Invalid State");
           break;
@@ -40,16 +47,26 @@ void Indicator::process()
 {
       switch (_currentState) {
       case State::INIT:
+          off();
           blue();
           break;
       case State::LOCKED:
+          off();
           red();
           break;
       case State::UNLOCKED:
+          off();
           green();
           break;
       case State::ALARM:
+          off();
+          blink();
           red();
+          break;
+      case State::BUSY:
+          off();
+          blink();
+          blue();
           break;
       default:
           off();
@@ -64,6 +81,11 @@ void Indicator::green()
   digitalWrite(_greenLED, HIGH);
   digitalWrite(_blueLED, LOW);
   digitalWrite(_redLED, LOW);
+}
+
+void Indicator::blink()
+{
+  digitalWrite(_blink, HIGH);
 }
 
 void Indicator::blue()
@@ -85,5 +107,7 @@ void Indicator::off()
   digitalWrite(_greenLED, LOW);
   digitalWrite(_blueLED, LOW);
   digitalWrite(_redLED, LOW);
+  digitalWrite(_alarm, LOW);
+  digitalWrite(_blink, LOW);
 }
 
