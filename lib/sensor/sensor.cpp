@@ -31,36 +31,23 @@ void Sensor::setup() {
 
 }
 
-bool Sensor::readSensor(sensors_event_t a, sensors_event_t g, sensors_event_t temp) {
+bool Sensor::readSensor(bikedata *data) {
   if(!_ready){
     setup();
     return false;
   }
+  sensors_event_t a, g, temp;
   if(_mpu.getMotionInterruptStatus()) {
     /* Get new sensor events with the readings */
     _mpu.getEvent(&a, &g, &temp);
+    data->a = a;
+    data->g = g;
+    data->temp = temp;
+    data->motion = true;
     debuglnV("Motion Detected");
-    /* Print out the values */
-    // Serial.print("AccelX:");
-    // Serial.print(a.acceleration.x);
-    // Serial.print(",");
-    // Serial.print("AccelY:");
-    // Serial.print(a.acceleration.y);
-    // Serial.print(",");
-    // Serial.print("AccelZ:");
-    // Serial.print(a.acceleration.z);
-    // Serial.print(", ");
-    // Serial.print("GyroX:");
-    // Serial.print(g.gyro.x);
-    // Serial.print(",");
-    // Serial.print("GyroY:");
-    // Serial.print(g.gyro.y);
-    // Serial.print(",");
-    // Serial.print("GyroZ:");
-    // Serial.print(g.gyro.z);
-    debuglnV("");
     return true;
   }
+  data->motion= false;
 
   return false;
 }

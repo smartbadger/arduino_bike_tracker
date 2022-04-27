@@ -16,12 +16,12 @@
 #define redLed (3)
 #define alarm (2)
 #define blink (1)
-#define relay (0)
+#define power (0)
 #define PN532_IRQ (6)
 #define PN532_RESET (7) 
 #define debugging true
 
-Indicator IND = Indicator(blink, greenLed, blueLed, redLed, alarm);
+Indicator IND = Indicator(blink, greenLed, blueLed, redLed, alarm, power);
 NfcReader NFC = NfcReader(PN532_IRQ, PN532_RESET, RFID_KEY);
 Sensor SEN = Sensor();
 GSMInterface GSMI = GSMInterface(20000);
@@ -30,30 +30,21 @@ sensors_event_t a, g,temp;
 auto t1 = timer_create_default();
 auto t2 = timer_create_default();
 auto t3 = timer_create_default();
-bool locked = true;
-bool motion = false;
+auto t4 = timer_create_default();
 bikedata bike;
 
 bool printBike(void *){
-  Serial.println("BIKE STATE:");
-  Serial.print("Locked:");
-  Serial.print(bike.locked);
-  Serial.println("");
-  Serial.print("Signal:");
-  Serial.print(bike.signal);
-  Serial.println("LOCATION");
-  Serial.print("latitude:");
-  Serial.print(bike.location.latitude);
-  Serial.print("  longitude:");
-  Serial.print(bike.location.longitude);
-  Serial.print("  accuracy:");
-  Serial.print(bike.location.accuracy);
-  Serial.print("  altitude:");
-  Serial.print(bike.location.altitude);
-  Serial.println("SENSOR");
-  Serial.print("gyroX:");
-  Serial.print(bike.g.gyro.heading);
-  Serial.println("");
+  bike.print();
+  return true;
+}
+
+bool readSensor(void *){
+    debuglnV("read Sensor");
+  SEN.readSensor(&bike);
+  if (bike.locked && bike.motion){
+    IND.setState(3);
+    bike.motion = false;
+  }
   return true;
 }
 
@@ -72,12 +63,12 @@ bool callGSM(void *){
 bool callNFC(void *){
   debuglnV("calling NFC");
   bool auth = NFC.isAuthorized();
-  if(auth && locked){
+  if(auth && bike.locked){
     IND.setState(2);
-    locked = false;
-  }else if (auth && !locked){
+    bike.locked = false;
+  }else if (auth && !bike.locked){
     IND.setState(1);
-    locked = true;
+    bike.locked = true;
   }
   IND.process();
   return true;
@@ -106,16 +97,12 @@ void loop() {
   if (t2.empty()) {
     t2.in(2000, callNFC);
   }
+  if (t4.empty()) {
+    t4.in(500, readSensor);
+  }
   t1.tick();
   t2.tick();
   t3.tick();
-
-  motion = SEN.readSensor(bike.a, bike.g, bike.temp);
-  if (locked && motion){
-    IND.setState(3);
-    motion = false;
-    delay(1000);
-  }
-
+  t4.tick();
   IND.process();
 }
