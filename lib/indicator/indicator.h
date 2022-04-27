@@ -25,7 +25,7 @@ public:
   Indicator(int blink, int greenLED, int blueLED, int redLED, int alarm);
 
   void setState(int state);
-
+  enum State getState();
   void process();
 
 private:

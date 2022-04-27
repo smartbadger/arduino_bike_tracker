@@ -9,10 +9,10 @@ static const char *_GPRS_PASSWORD = SECRET_PASS;
 
 GSMInterface::GSMInterface(long timeout) {
 	State _currentState = DISCONNECTED;
-	State _targetState = READY;
 	_timeout = timeout;
 	_connected = false;
 	_expired = false;
+	_modemReady = false;
 }
 
 GSMInterface::~GSMInterface(){
@@ -21,47 +21,31 @@ GSMInterface::~GSMInterface(){
 
 void GSMInterface::setup() {
 	debuglnV("Setting up GSM Interface");
+	long start = millis();
+	while(!_modemReady && millis() - start < _timeout){
+		if(!scanner.begin()){
+			debuglnV("Issue connecting to modem");
+			delay(1000);
+		}else {
+			_modemReady = true;
+			debuglnV("Modem OK");
+			break;
+		}
+	}
 }
 
-void GSMInterface::ready() {
-	_targetState = _currentState;
-}
-
-void GSMInterface::doNetworkStuff()
+void GSMInterface::doNetworkStuff(bikedata *data)
 {
-	if (_targetState == DISCONNECTED)
+	if (_currentState == DISCONNECTED)
 	{
-		goToReady();
+		connectNetwork();
 	}
-	else if (_targetState == READY)
+	else if (_currentState == READY)
 	{
-		measureLocation();
-	}
-	else if (_targetState == SEND_STATUS)
-	{
-		goToSend();
+		data->location = measureLocation();
+		data->signal = getNetworkStatus();
 	}
 	
-}
-void GSMInterface::goToSend(){
-	debuglnV("try to send");
-}
-
-void GSMInterface::goToDisconnected() {
-	debuglnV("disconnect");
-}
-
-void GSMInterface::goToReady() {
-	switch (_currentState)
-    {
-    case DISCONNECTED:
-      connectNetwork();
-      break;
-
-    case SEND_STATUS:
-      debuglnV("sending status");
-      break;
-    }
 }
 
 // originally in while loop with break
@@ -70,7 +54,7 @@ Location GSMInterface::measureLocation()
 {
 	if (gsmlocation.available() && gsmlocation.accuracy() != 0)
 	{
-        		debuglnV("location available");
+        debuglnV("location available");
 		return Location
 		{
 			gsmlocation.latitude(),
@@ -78,12 +62,11 @@ Location GSMInterface::measureLocation()
 			gsmlocation.altitude(),
 			gsmlocation.accuracy()
 		};
-	}
-	
-		// negative accuracy means invalid
-		debuglnV("location not available");
-		return Location
-		{ 0, 0, 0, -1 };
+	}	
+	// negative accuracy means invalid
+	debuglnV("location not available");
+	return Location
+	{ 0, 0, 0, -1 };
 	
 }
 
@@ -96,20 +79,27 @@ void GSMInterface::connectNetwork()
 	gprs.setTimeout(_timeout);
 	gsmAccess.setTimeout(_timeout);
 	long start = millis();
+	debuglnV("Attempting connection...");
 	// Start GSM connection
-	while ( _currentState == DISCONNECTED || millis() - start < _timeout)
+	while ( _currentState == DISCONNECTED && millis() - start < _timeout)
 	{
-		debuglnV("GSM: failed to connect");
 		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY) &(gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY))
 		{
-			_currentState = READY;
 			debuglnV("GSM: connected to the network");
-			ready();
+			_currentState = READY;
+			_connected = true;
+			break;
+		}else{
+			debuglnV("GSM: failed to connect");
 		}
 
 	}
 }
-
+String GSMInterface::getNetworkStatus() {
+	// Serial.println(scanner.readNetworks());
+	// scanner.getCurrentCarrier();
+	return scanner.getSignalStrength();
+}
 void GSMInterface::setExpired(boolean value){
 	this->_expired = value;
 }
@@ -122,28 +112,30 @@ void GSMInterface::sendData()
 }
 
 // originally in while loop with break
-void GSMInterface::sendText(Location value)
+void GSMInterface::sendText()
 {
 	if (sms.available())
 	{
 		//check for SMS available
-		char senderNumber[20] = { "0" };
-		sms.remoteNumber(senderNumber, 20);	//Get remote number
-		int c = sms.read();
-		//Discard the the message if the first char is not a "L"
-		if (c != 76)
-		{
-			sms.flush();
-			// return;
-		}
+		// char senderNumber[20] = { "0" };
+		// sms.remoteNumber(senderNumber, 20);	//Get remote number
+		// int c = sms.read();
+		// //Discard the the message if the first char is not a "L"
+		// if (c != 76)
+		// {
+		// 	sms.flush();
+		// 	// return;
+		// }
 
-		//concatenate the string message to be sended to the remote number
-		String txtMsg = "https://www.google.com/maps/place/" + String(value.latitude, 6) + "," + String(value.longitude, 6);
+		// //concatenate the string message to be sended to the remote number
+		// String txtMsg = "https://www.google.com/maps/place/" + String(value.latitude, 6) + "," + String(value.longitude, 6);
 
-		// send the message
-		sms.beginSMS(senderNumber);
-		sms.print(txtMsg);
-		sms.endSMS();
+		// // send the message
+		// sms.beginSMS(senderNumber);
+		// sms.print(txtMsg);
+		// sms.endSMS();
 		// return;
+	}else {
+		debuglnV("error sending");
 	}
 }

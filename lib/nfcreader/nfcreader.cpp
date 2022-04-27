@@ -17,7 +17,7 @@ String NfcReader::readNFC()
     String result = "";
     uint8_t keya[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; // Try with the factory default KeyA: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
     debuglnV("Waiting for an ISO14443A Card ...");
-    success = _nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 500);
+    success = _nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 1000);
     if (success && uidLength == 4)
     {
         debuglnV("Found an ISO14443A card, Trying to authenticate block 4 with default KEYA value");
@@ -43,7 +43,7 @@ String NfcReader::readNFC()
 
 bool NfcReader::isAuthorized()
 {
-    return String(_key) == readNFC();
+    return (String(_key) == readNFC());
 }
 
 void NfcReader::setup()

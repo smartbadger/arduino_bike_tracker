@@ -4,7 +4,7 @@
 #define _GSM_H
 
 #include <MKRGSM.h>
-#include "location.h"
+#include "bikestate.h"
 
 class GSMInterface
 {
@@ -12,12 +12,10 @@ class GSMInterface
 	public:
 		GSMInterface(long timeout);
         ~GSMInterface();
-	    void ready();
-	    void doNetworkStuff();
+	    void doNetworkStuff(bikedata *data);
         void setup();
         // originally in while loop with break
 	    // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied
-	    Location measureLocation();
 		//send json data to endpoint
     	void sendData();
 
@@ -26,31 +24,29 @@ class GSMInterface
         {
             DISCONNECTED,
             READY,
-            SEND_STATUS,
+            SENDING,
+            RECEIVING,
         };
         State _currentState;
-        State _targetState;
         GPRS gprs;
         GSM gsmAccess;
         GSM_SMS sms;
+        GSMScanner scanner;
         GSMLocation gsmlocation;
         boolean _connected;
         boolean _expired;
+        boolean _modemReady;
         unsigned long _timeout;
-    
-		void goToDisconnected();
-	    void goToReady();
-	    void goToSend();
-        void connect();
 
+	    Location measureLocation();
         void setExpired(boolean value);
-
+        String getNetworkStatus();
 	    //The connectNetwork() function is used for the board data connection
         // originally in while loop with break
 	    void connectNetwork();
 
         // originally in while loop with break
-	    void sendText(Location value);
+	    void sendText();
 };
 
 #endif

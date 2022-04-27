@@ -75,6 +75,9 @@ void Indicator::process()
       }
 }
 
+Indicator::State Indicator::getState(){
+    return _currentState;
+}
 
 void Indicator::green()
 {
