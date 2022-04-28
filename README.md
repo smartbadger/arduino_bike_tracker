@@ -1,4 +1,4 @@
-#GPS Bike Tracker
+# GPS Bike Tracker
 
 I want to create a gps tracker that's integrated into my e-bike to allow for GPS tracking and prevent e-bike functionality unless the bike is unlocked. I plan to create a tracker that will:
 
