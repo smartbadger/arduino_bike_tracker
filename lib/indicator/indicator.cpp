@@ -18,8 +18,7 @@ Indicator::Indicator(int blink, int greenLED, int blueLED, int redLED, int alarm
   pinMode(_alarm, OUTPUT);
   pinMode(_blink, OUTPUT);
   pinMode(_power, OUTPUT);
-  off();
-  process();
+
 }
 
 void Indicator::setState(int state){
@@ -85,7 +84,13 @@ void Indicator::process()
 Indicator::State Indicator::getState(){
     return _currentState;
 }
-
+void Indicator::sleep(){
+    off();
+}
+void Indicator::setup(){
+  debuglnV("Setting up Indicator...");
+  process();
+}
 void Indicator::green()
 {
   digitalWrite(_greenLED, HIGH);

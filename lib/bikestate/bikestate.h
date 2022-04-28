@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
-#include "debugger.h"
+// #include "debugger.h"
 #include "location.h"
 
 struct bikedata {
@@ -12,6 +12,7 @@ struct bikedata {
   bool motion = false;
   bool powerOn = false;
   double battery = 0.0;
+  bool network = false;
   Location location = {0, 0, 0, -1};
   String signal = "0";
   sensors_event_t a;

@@ -6,6 +6,9 @@ static const char *_PINNUMBER = SECRET_PIN;
 static const char *_GPRS_APN = SECRET_APN;
 static const char *_GPRS_LOGIN = SECRET_LOGIN;
 static const char *_GPRS_PASSWORD = SECRET_PASS;
+static const char *_SERVER = SERVER_URL;
+static const int _SERVER_PORT = SERVER_PORT;
+
 
 GSMInterface::GSMInterface(long timeout) {
 	State _currentState = DISCONNECTED;
@@ -96,7 +99,7 @@ void GSMInterface::connectNetwork()
 	}
 }
 String GSMInterface::getNetworkStatus() {
-	// Serial.println(scanner.readNetworks());
+	// debuglnV(scanner.readNetworks());
 	// scanner.getCurrentCarrier();
 	return scanner.getSignalStrength();
 }
@@ -106,13 +109,29 @@ void GSMInterface::setExpired(boolean value){
 
 //code section used to initialize data connection and localization object
 	//send json data to endpoint
-void GSMInterface::sendData()
+void GSMInterface::sendDataFromClient()
 {
+  // if you get a connection, report back via serial:
+  if (client.connect(_SERVER, _SERVER_PORT)) {
+    debuglnV("connected");
+    // Send a Message request:
+    // client.println("{\"k\":\"" + HOLOGRAM_DEVICE_KEY +"\",\"d\":\""+ HOLOGRAM_MESSAGE+ "\",\"t\":\""+HOLOGRAM_TOPIC+"\"}");
+  } else {
+    // if you didn't get a connection to the server:
+    debuglnV("connection failed");
+  }
+}
+void GSMInterface::readDataFromServer(){
+  if (client.available()) {
+    char c = client.read();
+    Serial.print(c);
+  }
+}
+void GSMInterface::readSMS(){
 
 }
-
 // originally in while loop with break
-void GSMInterface::sendText()
+void GSMInterface::sendSMS()
 {
 	if (sms.available())
 	{

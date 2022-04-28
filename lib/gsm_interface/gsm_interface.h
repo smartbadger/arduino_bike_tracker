@@ -17,7 +17,6 @@ class GSMInterface
         // originally in while loop with break
 	    // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied
 		//send json data to endpoint
-    	void sendData();
 
 	private:
         enum State
@@ -34,6 +33,7 @@ class GSMInterface
         GSMScanner scanner;
         GSMLocation gsmlocation;
         boolean _connected;
+        GSMSSLClient client;
         boolean _expired;
         boolean _modemReady;
         unsigned long _timeout;
@@ -41,12 +41,11 @@ class GSMInterface
 	    Location measureLocation();
         void setExpired(boolean value);
         String getNetworkStatus();
-	    //The connectNetwork() function is used for the board data connection
-        // originally in while loop with break
 	    void connectNetwork();
-
-        // originally in while loop with break
-	    void sendText();
+        void sendDataFromClient();
+        void readDataFromServer();
+	    void sendSMS();
+        void readSMS();
 };
 
 #endif

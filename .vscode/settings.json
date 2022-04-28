@@ -3,6 +3,7 @@
     "*.liquid": "liquid",
     "array": "cpp",
     "string": "cpp",
-    "string_view": "cpp"
+    "string_view": "cpp",
+    "arduino.h": "c"
   }
 }

@@ -8,9 +8,9 @@
 
 class Sensor
 {
-    Adafruit_MPU6050 _mpu;
-    bool _ready;
     public:
+        Adafruit_MPU6050 _mpu;
+        bool _ready;
         Sensor();
         void setup();
         // bool readSensor(sensors_event_t *a, sensors_event_t *g, sensors_event_t *temp);
