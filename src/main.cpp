@@ -24,13 +24,13 @@ NfcReader NFC = NfcReader(PN532_IRQ, PN532_RESET, RFID_KEY);
 Sensor SEN = Sensor();
 GSMInterface GSMI = GSMInterface(20000);
 
+bikedata bike;
 sensors_event_t a, g,temp;
+int counter = 0;
 auto t1 = timer_create_default();
 auto t2 = timer_create_default();
 auto t3 = timer_create_default();
 auto t4 = timer_create_default();
-bikedata bike;
-int counter = 0;
 
 // TODO: implement low power, silent mode, check in frequency, and hardware removal
 // TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)

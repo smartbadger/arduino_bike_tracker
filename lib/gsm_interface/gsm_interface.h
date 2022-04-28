@@ -23,6 +23,8 @@ class GSMInterface
         {
             DISCONNECTED,
             READY,
+            IDLE,
+            SLEEP,
             SENDING,
             RECEIVING,
         };
