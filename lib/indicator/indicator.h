@@ -27,10 +27,10 @@ public:
 
   void setState(int state);
   enum State getState();
-  void process();
+  void update();
   void setup();
   void sleep();
-  
+
 private:
   void powerOn();
   void powerOff();

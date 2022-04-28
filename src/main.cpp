@@ -39,16 +39,16 @@ bool printBike(void *){
   return true;
 }
 
-void deepSleep() {
+void deepSleep(int timeout) {
 
-  debuglnV("inactive setting sleep for 1min");
+  debuglnV("inactive setting sleep...");
   counter = 0;
   
   // look into deep sleep with external wake up 
   // PN532 Sleep somewhere here...
   SEN._mpu.enableSleep(true); // MPU6050 Sleep
   IND.sleep(); // Lights OFF
-  LowPower.sleep(10000);
+  LowPower.sleep(timeout);
 }
 
 float readBattery(bool volt) { // Read battery voltage
@@ -81,10 +81,10 @@ bool callGSM(void *){
   debuglnV("calling GSM");
   auto state = IND.getState();
   IND.setState(4);
-  IND.process();
+  IND.update();
   GSMI.doNetworkStuff(&bike); // can take some time
   IND.setState(state);
-  IND.process();
+  IND.update();
   // revert to prev state
   return true;
 }
@@ -99,14 +99,14 @@ bool callNFC(void *){
     IND.setState(1);
     bike.locked = true;
   }
-  IND.process();
+  IND.update();
   return true;
 }
 
-void dummy() {
+void onWakeUp() {
   debuglnV("WOKE UP");
   SEN._mpu.enableSleep(false);
-  IND.process();
+  IND.update();
 }
 
 void setup(void) {
@@ -117,7 +117,7 @@ void setup(void) {
       delay(100); // will pause Zero, Leonardo, etc until serial console opens
     }
   }
-  LowPower.attachInterruptWakeup(RTC_ALARM_WAKEUP, dummy, CHANGE);
+  LowPower.attachInterruptWakeup(RTC_ALARM_WAKEUP, onWakeUp, CHANGE);
   SEN.setup();
   NFC.setup();
   GSMI.setup();
@@ -137,13 +137,13 @@ void loop(void) {
     t4.in(500, readSensor);
   }
   if(counter > 30){
-    deepSleep();
+    deepSleep(10000);
   }
   t1.tick();
   t2.tick();
   t3.tick();
   t4.tick();
-  IND.process();
+  IND.update();
 }
 
 // Additional notes

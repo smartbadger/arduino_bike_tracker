@@ -44,7 +44,7 @@ void Indicator::setState(int state){
       }
 }
 
-void Indicator::process()
+void Indicator::update()
 {
       switch (_currentState) {
       case State::INIT:
@@ -89,7 +89,7 @@ void Indicator::sleep(){
 }
 void Indicator::setup(){
   debuglnV("Setting up Indicator...");
-  process();
+  update();
 }
 void Indicator::green()
 {

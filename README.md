@@ -17,4 +17,6 @@ I want to create a gps tracker that's integrated into my e-bike to allow for GPS
 - PN532 V3
 - MPU6050
 
+Separate 555 timer for blinking light during blocking operations
+
 ![wiring](docs/diagram.png "wiring")
