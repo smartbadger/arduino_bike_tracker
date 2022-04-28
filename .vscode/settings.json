@@ -1,0 +1,9 @@
+{
+  "files.associations": {
+    "*.liquid": "liquid",
+    "array": "cpp",
+    "string": "cpp",
+    "string_view": "cpp",
+    "arduino.h": "c"
+  }
+}
