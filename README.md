@@ -16,3 +16,5 @@ I want to create a gps tracker that's integrated into my e-bike to allow for GPS
 - MKR GSM 1400
 - PN532 V3
 - MPU6050
+
+![wiring](docs/diagram.png "wiring")
