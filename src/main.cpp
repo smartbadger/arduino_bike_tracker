@@ -32,7 +32,7 @@ auto t2 = timer_create_default();
 auto t3 = timer_create_default();
 auto t4 = timer_create_default();
 
-// TODO: implement low power, silent mode, check in frequency, and hardware removal
+// TODO: implement low power, silent mode, check in frequency, and peripheral/sensor disrupts
 // TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)
 bool printBike(void *){
   bike.print();
@@ -172,7 +172,3 @@ void loop(void) {
 
 // CONDITION: when bike is unlocked and idle for a set amount of time
 // lock bike
-
-
-
-// inside the loop function

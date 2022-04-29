@@ -16,6 +16,7 @@ I want to create a gps tracker that's integrated into my e-bike to allow for GPS
 - MKR GSM 1400
 - PN532 V3
 - MPU6050
+- BN-880 GPS // added due to location inaccuracy of MKR 1400 GPRS
 
 Separate 555 timer for blinking light during blocking operations
 
