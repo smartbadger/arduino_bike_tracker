@@ -6,3 +6,4 @@
 secrets.h
 example.cpp.old
 build/*
+*ignore_*

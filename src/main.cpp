@@ -1,33 +1,19 @@
-#include "nfcreader.h"
 #include <Arduino.h>
 #include <arduino-timer.h>
+#include "nfcreader/nfcreader.h"
 #include "ArduinoLowPower.h"
-#include "indicator.h"
-#include "sensor.h"
-#include "gsm_interface.h"
-#include "secrets.h"
-#include "models.h"
-#include "debugger.h"
-#include "gps.h"
-
-#define blueLed (5)
-#define greenLed (4)
-#define redLed (3)
-#define alarm (2)
-#define blink (1)
-#define power (0)
-#define PN532_IRQ (6)
-#define PN532_RESET (7)
-#define debugging true
+#include "indicator/indicator.h"
+#include "sensor/sensor.h"
+#include "gsm_interface/gsm_interface.h"
+#include "gps/gps.h"
+#include "config.h"
 
 using namespace useGPS;
 using namespace gyrosensor;
 using namespace nfcReaderpn;
 
 Indicator IND = Indicator(blink, greenLed, blueLed, redLed, alarm, power);
-
 GSMInterface GSMI = GSMInterface(20000);
-
 bikedata bike;
 sensors_event_t a, g, temp;
 int counter = 0;
@@ -133,7 +119,7 @@ void setup(void)
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  if (debugging)
+  if (DEBUGLEVEL)
   {
     while (!Serial)
     {
@@ -151,27 +137,27 @@ void setup(void)
 }
 void loop(void)
 {
-  if (t1.empty())
-  {
-    t1.in(30000, callGSM);
-  }
-  if (t2.empty())
-  {
-    t2.in(2000, callNFC);
-  }
-  if (t4.empty())
-  {
-    t4.in(500, readSensor);
-  }
-  if (counter > 30)
-  {
-    deepSleep();
-  }
-  t1.tick();
-  t2.tick();
+  // if (t1.empty())
+  // {
+  //   t1.in(30000, callGSM);
+  // }
+  // if (t2.empty())
+  // {
+  //   t2.in(2000, callNFC);
+  // }
+  // if (t4.empty())
+  // {
+  //   t4.in(500, readSensor);
+  // }
+  // if (counter > 30)
+  // {
+  //   deepSleep();
+  // }
+  // t1.tick();
+  // t2.tick();
   t3.tick();
-  t4.tick();
-  IND.process();
+  // t4.tick();
+  // IND.process();
   useGPS::GPSloop(bike);
 }
 
