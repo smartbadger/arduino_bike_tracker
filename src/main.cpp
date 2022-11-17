@@ -12,8 +12,8 @@ using namespace useGPS;
 using namespace gyrosensor;
 using namespace nfcReaderpn;
 
-Indicator IND = Indicator(blink, greenLed, blueLed, redLed, alarm, power);
-GSMInterface GSMI = GSMInterface(20000);
+Indicator IND = Indicator(BLINK_PIN, GREEN_PIN, BLUE_PIN, RED_PIN, ALARM_PIN, POWER_PIN);
+GSMInterface GSMI = GSMInterface(GSM_TIMEOUT);
 bikedata bike;
 sensors_event_t a, g, temp;
 int counter = 0;
@@ -40,7 +40,7 @@ void deepSleep()
   // PN532 Sleep somewhere here...
   gyrosensor::sleep(true); // MPU6050 Sleep
   IND.sleep();             // Lights OFF
-  LowPower.sleep(10000);
+  LowPower.sleep(SLEEP_DURATION);
 }
 
 float readBattery(bool volt)
@@ -137,27 +137,27 @@ void setup(void)
 }
 void loop(void)
 {
-  // if (t1.empty())
-  // {
-  //   t1.in(30000, callGSM);
-  // }
-  // if (t2.empty())
-  // {
-  //   t2.in(2000, callNFC);
-  // }
-  // if (t4.empty())
-  // {
-  //   t4.in(500, readSensor);
-  // }
-  // if (counter > 30)
-  // {
-  //   deepSleep();
-  // }
-  // t1.tick();
-  // t2.tick();
+  if (t1.empty())
+  {
+    t1.in(30000, callGSM);
+  }
+  if (t2.empty())
+  {
+    t2.in(2000, callNFC);
+  }
+  if (t4.empty())
+  {
+    t4.in(500, readSensor);
+  }
+  if (counter > 30)
+  {
+    deepSleep();
+  }
+  t1.tick();
+  t2.tick();
   t3.tick();
-  // t4.tick();
-  // IND.process();
+  t4.tick();
+  IND.process();
   useGPS::GPSloop(bike);
 }
 
