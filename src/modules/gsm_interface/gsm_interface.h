@@ -7,12 +7,13 @@
 #include "models.h"
 #include "secrets.h"
 #include "debugger.h"
+#include "config.h"
 
 class GSMInterface
 {
 
 public:
-    GSMInterface(long timeout);
+    GSMInterface();
     ~GSMInterface();
     void doNetworkStuff(bikedata *data);
     void setup();

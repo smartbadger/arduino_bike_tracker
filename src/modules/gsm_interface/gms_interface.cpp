@@ -7,10 +7,10 @@ static const char *_GPRS_PASSWORD = SECRET_PASS;
 static const char *_SERVER = SERVER_URL;
 static const int _SERVER_PORT = SERVER_PORT;
 
-GSMInterface::GSMInterface(long timeout)
+GSMInterface::GSMInterface()
 {
 	State _currentState = DISCONNECTED;
-	_timeout = timeout;
+	_timeout = GSM_TIMEOUT;
 	_connected = false;
 	_expired = false;
 	_modemReady = false;

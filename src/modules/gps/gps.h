@@ -64,8 +64,8 @@
 
 //------------------------------------------------------------
 
-static NMEAGPS gps; // This parses the GPS characters
-namespace useGPS
+static NMEAGPS neoGPS; // This parses the GPS characters
+namespace GPS
 {
 
     //----------------------------------------------------------------
@@ -101,19 +101,19 @@ namespace useGPS
     }
     static void displaySatellitesInView()
     {
-        DEBUG_PORT.print(gps.sat_count);
+        DEBUG_PORT.print(neoGPS.sat_count);
         DEBUG_PORT.print(',');
 
-        for (uint8_t i = 0; i < gps.sat_count; i++)
+        for (uint8_t i = 0; i < neoGPS.sat_count; i++)
         {
-            DEBUG_PORT.print(gps.satellites[i].id);
+            DEBUG_PORT.print(neoGPS.satellites[i].id);
             DEBUG_PORT.print(' ');
-            DEBUG_PORT.print(gps.satellites[i].elevation);
+            DEBUG_PORT.print(neoGPS.satellites[i].elevation);
             DEBUG_PORT.print('/');
-            DEBUG_PORT.print(gps.satellites[i].azimuth);
+            DEBUG_PORT.print(neoGPS.satellites[i].azimuth);
             DEBUG_PORT.print('@');
-            if (gps.satellites[i].tracked)
-                DEBUG_PORT.print(gps.satellites[i].snr);
+            if (neoGPS.satellites[i].tracked)
+                DEBUG_PORT.print(neoGPS.satellites[i].snr);
             else
                 DEBUG_PORT.print('-');
             DEBUG_PORT.print(F(", "));
@@ -149,8 +149,8 @@ namespace useGPS
 
     static void GPSloop(bikedata &data)
     {
-        while (gps.available(gpsPort))
-            doSomeWork(gps.read(), data);
+        while (neoGPS.available(gpsPort))
+            doSomeWork(neoGPS.read(), data);
 
     } // GPSloop
 
@@ -160,9 +160,9 @@ namespace useGPS
     {
         DEBUG_PORT.print(F("NMEAloc.INO: started\n"));
         DEBUG_PORT.print(F("fix object size = "));
-        DEBUG_PORT.println(sizeof(gps.fix()));
+        DEBUG_PORT.println(sizeof(neoGPS.fix()));
         DEBUG_PORT.print(F("NMEAGPS object size = "));
-        DEBUG_PORT.println(sizeof(gps));
+        DEBUG_PORT.println(sizeof(neoGPS));
         DEBUG_PORT.println(F("Looking for GPS device on " GPS_PORT_NAME));
 
 #ifdef NMEAGPS_NO_MERGING

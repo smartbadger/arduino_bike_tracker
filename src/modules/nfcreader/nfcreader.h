@@ -7,7 +7,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_PN532.h>
-namespace nfcReaderpn
+namespace NFC
 {
   bool _nfcReady = false;
   Adafruit_PN532 _nfc(PN532_IRQ, PN532_RESET);

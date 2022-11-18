@@ -10,7 +10,7 @@
 #include "sensor.h"
 #include "debugger.h"
 
-namespace gyrosensor
+namespace GYRO
 {
     Adafruit_MPU6050 _mpu;
     boolean _ready = false;

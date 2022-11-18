@@ -5,9 +5,12 @@
 
 #include <Arduino.h>
 #include "config.h"
-namespace system
+#include "ArduinoLowPower.h"
+
+namespace System
 {
-    void setup()
+
+    void setup(void (*callback)())
     {
         pinMode(GREEN_PIN, OUTPUT);
         pinMode(BLUE_PIN, OUTPUT);
@@ -15,6 +18,12 @@ namespace system
         pinMode(ALARM_PIN, OUTPUT);
         pinMode(BLINK_PIN, OUTPUT);
         pinMode(POWER_PIN, OUTPUT);
+        LowPower.attachInterruptWakeup(RTC_ALARM_WAKEUP, callback, CHANGE);
+    }
+
+    void sleep()
+    {
+        LowPower.sleep(SLEEP_DURATION);
     }
 
     int setPin(int pin, bool state)

@@ -1,4 +1,4 @@
-#pragma once
+
 #ifndef MODELS_H
 #define MODELS_H
 
@@ -6,7 +6,7 @@
 #include <Adafruit_Sensor.h>
 #include <time.h>
 #include <cppQueue.h>
-// #include "debugger.h"
+#include "debugger.h"
 struct Location
 {
     float latitude;
@@ -24,15 +24,6 @@ struct bikedata
     float speed_mph = 0;
     char updated;
     int satellites = 0;
-    enum Mode
-    {
-        OFF,
-        ON,
-        LOCKED,
-        UNLOCKED,
-        ERROR
-    };
-    char mode = OFF;
     bool network = false;
     Location location = {0, 0, 0, -1};
     String signal = "0";
