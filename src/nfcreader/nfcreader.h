@@ -3,17 +3,14 @@
 #define _NFCREADER_H
 #include "secrets.h"
 #include "debugger.h"
+#include "config.h"
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_PN532.h>
-#define PN532_IRQ (6)
-#define PN532_RESET (7)
-
-
 namespace nfcReaderpn
 {
   bool _nfcReady = false;
-  Adafruit_PN532 _nfc(6, 7);
+  Adafruit_PN532 _nfc(PN532_IRQ, PN532_RESET);
 
   String readNFC()
   {
