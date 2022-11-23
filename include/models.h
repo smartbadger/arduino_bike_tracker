@@ -1,12 +1,27 @@
-
-#ifndef MODELS_H
-#define MODELS_H
+#pragma once
 
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <time.h>
 #include <cppQueue.h>
 #include "debugger.h"
+
+#ifndef MODELS_H
+#define MODELS_H
+
+enum Event
+{
+    LOCK,
+    UNLOCK,
+    INIT_COMPLETE,
+    NFC_REJECTED,
+    NFC_AUTHENTICATED,
+    DETECTED_NFC,
+    MOTION_DETECTED,
+    // IDLE,
+    WAKEUP,
+};
+
 struct Location
 {
     float latitude;
@@ -15,7 +30,7 @@ struct Location
     long accuracy;
 };
 
-struct bikedata
+struct BikeData
 {
     bool locked = true;
     bool motion = false;
@@ -30,6 +45,8 @@ struct bikedata
     sensors_event_t a;
     sensors_event_t g;
     float temp;
+
+    // create dynamic setters and getters for each field in the struct
 
     void print()
     {

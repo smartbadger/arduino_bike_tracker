@@ -9,41 +9,69 @@
 #include <string.h>
 #include <map>
 #include <vector>
+#include "StateMachine.h"
 
-namespace BikeState
+class BikeEventData : public EventData
 {
-    enum State
+};
+
+class Bike : public StateMachine
+{
+public:
+    Bike();
+    void setup();
+    // void motionDetected();
+    // void cardDetected();
+    // void update()
+
+private:
+    enum States
     {
         INIT,
         LOCKED,
-        UNLOCKED,
+        IDLE,
         ALARM,
-        BUSY,
-        SLEEP
+        NFC_AUTHENTICATING,
+        NFC_AUTHENTICATED,
+        NFC_REJECTED,
+        SLEEP,
+        MAX_STATES
     };
+
+    void stateINIT(const NoEventData *);
+
+    StateAction<Bike, NoEventData, &Bike::stateINIT> init;
+
+    virtual const StateMapRowEx *GetStateMapEx() { return NULL; }
+    virtual const StateMapRow *GetStateMap()
+    {
+        static const StateMapRow STATE_MAP[] = {
+            &init};
+        // C_ASSERT((sizeof(STATE_MAP)/sizeof(StateMapRow)) == MAX_STATES);
+        return &STATE_MAP[0];
+    }
+};
+namespace BikeState
+{
 
     enum Event
     {
-        INIT_EVENT,
-        NFC_READ,
+        INIT_COMPLETE,
+        NFC_REJECTED,
+        NFC_AUTHENTICATED,
         MOTION_DETECTED,
-        TIMEOUT,
-        GSM_TRANSMIT,
+        ALARM_COMPLETED,
+        DETECTED_NFC,
         IDLE,
-        WAKEUP
+        WAKEUP,
     };
+    // q: state machine with transitions?
 
     State _currentState;
+    State _previousState;
     State _targetState;
+    Event _currentEvent;
 
-    std::map<State, std::vector<std::pair<Event, State>>> _stateEventMap = {
-        {State::INIT, {{Event::INIT_EVENT, State::LOCKED}}},
-        {State::LOCKED, {{Event::NFC_READ, State::UNLOCKED}, {MOTION_DETECTED, State::ALARM}}},
-        {State::UNLOCKED, {{Event::IDLE, State::LOCKED}, {Event::NFC_READ, State::LOCKED}}},
-        {State::ALARM, {{Event::TIMEOUT, State::LOCKED}}},
-        {State::BUSY, {{Event::GSM_TRANSMIT, State::LOCKED}}},
-        {State::SLEEP, {{Event::WAKEUP, State::INIT}}}};
-    ;
     void setState(int state);
     enum State getState();
     void processState();
@@ -58,4 +86,12 @@ namespace BikeState
     void sleep();
 };
 
+    // std::map<State, std::vector<std::pair<Event, State>>> _stateEventMap = {
+    //     {State::INIT, {{Event::INIT_COMPLETE, State::LOCKED}}},
+    //     {State::LOCKED, {{Event::MOTION_DETECTED, State::ALARM}, {Event::DETECTED_NFC, State::READING_NFC}, {Event::IDLE, State::SLEEP}}},
+    //     {State::ALARM, {{Event::ALARM_COMPLETED, State::LOCKED}, {Event::DETECTED_NFC, State::READING_NFC}}},
+    //     {State::READING_NFC, {{Event::NFC_REJECTED, State::LOCKED}, {Event::NFC_AUTHENTICATED, State::UNLOCKED}}},
+    //     {State::SLEEP, {{Event::WAKEUP, State::LOCKED}}},
+    //     {State::UNLOCKED, {{Event::IDLE, State::LOCKED}, {Event::DETECTED_NFC, State::READING_NFC}}}};
+    // ;
 #endif

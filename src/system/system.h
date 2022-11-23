@@ -88,16 +88,6 @@ namespace System
         setPin(POWER_PIN, true);
     }
 
-    float getBatteryVoltage()
-    {
-        return readBattery(true, ADC_BATTERY_MAIN);
-    }
-
-    float getReserveBatteryVoltage()
-    {
-        return readBattery(true, AIN_BATTERY_ALT);
-    }
-
     float readBattery(bool volt, int pin)
     { // Read battery voltage
         int sensorValue = analogRead(pin);
@@ -110,5 +100,15 @@ namespace System
             return sensorValue;
         }
     }
+    float getBatteryVoltage()
+    {
+        return readBattery(true, ADC_BATTERY_MAIN);
+    }
+
+    float getReserveBatteryVoltage()
+    {
+        return readBattery(true, AIN_BATTERY_ALT);
+    }
 }
+
 #endif

@@ -41,7 +41,7 @@ void GSMInterface::setup()
 	}
 }
 
-void GSMInterface::doNetworkStuff(bikedata *data)
+void GSMInterface::doNetworkStuff(BikeData *data)
 {
 	if (_currentState == DISCONNECTED)
 	{
@@ -50,7 +50,8 @@ void GSMInterface::doNetworkStuff(bikedata *data)
 	else if (_currentState == READY)
 	{
 		// data->location = measureLocation();
-		data->signal = getNetworkStatus();
+
+		// data->setGSM(false, getNetworkStatus());
 	}
 }
 

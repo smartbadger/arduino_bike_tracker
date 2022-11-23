@@ -4,7 +4,7 @@
 
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
-#include "models.h"
+#include "observer.h"
 
 #include <Wire.h>
 #include "sensor.h"
@@ -39,7 +39,7 @@ namespace GYRO
         _mpu.setInterruptPinPolarity(true);
         _mpu.setMotionInterrupt(true);
     }
-    bool readSensor(bikedata *data)
+    bool readSensor(BikeDataObservable *data)
     {
         if (!_ready)
         {
@@ -51,14 +51,8 @@ namespace GYRO
         {
             /* Get new sensor events with the readings */
             _mpu.getEvent(&a, &g, &temp);
-            data->a = a;
-            data->g = g;
-            data->temp = temp.temperature;
-            data->motion = true;
-            debuglnV("Motion Detected");
-            return true;
+            data->setGyro(g, a, temp.temperature);
         }
-        data->motion = false;
 
         return false;
     }

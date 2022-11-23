@@ -3,24 +3,18 @@
 #include "models.h"
 #include "debugger.h"
 #include "config.h"
+#include <map>
 
 #include "modules/sensor/sensor.h"
 #include "modules/gsm_interface/gsm_interface.h"
+#include "observer.h"
 #include "modules/nfcreader/nfcreader.h"
 #include "modules/gps/gps.h"
 #include "system/system.h"
 
-using namespace GPS;
-using namespace GYRO;
-using namespace NFC;
-
-bikedata bike;
-sensors_event_t a, g, temp;
+BikeDataObservable bike;
+EventObserver obs;
 int counter = 0;
-auto t1 = timer_create_default();
-auto t2 = timer_create_default();
-auto t3 = timer_create_default();
-auto t4 = timer_create_default();
 
 // TODO: implement low power, silent mode, check in frequency, and hardware removal
 // TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)
@@ -35,12 +29,120 @@ using namespace GYRO;
 using namespace NFC;
 using namespace System;
 
+// GSMInterface GsmController = GSMInterface();
+typedef bool (*FuncPtrBoolInt)(void *);
+struct ProcessManager
+{
+  Timer<10> timer;
+  std::map<bool (*)(void *), Timer<10>::Task> processes;
+
+  enum TaskState
+  {
+    PAUSED,
+    RUNNING,
+  };
+
+  TaskState currentState = PAUSED;
+  bool onComplete(bool (*cb)(void *))
+  {
+    debuglnV("Process Complete");
+    bool repeat = cb(nullptr);
+    if (!repeat)
+    {
+      processes.erase(cb);
+    }
+    return repeat;
+  }
+  void in(unsigned long delay, bool (*cb)(void *))
+  {
+    // q: how to cast to bool (*)(void *) to avoid compiler warning
+    Timer<10>::Task task = timer.in(delay, cb);
+    addProcess(cb, task);
+  }
+  void at(unsigned long delay, bool (*cb)(void *))
+  {
+    Timer<10>::Task task = timer.at(delay, cb);
+    addProcess(cb, task);
+  }
+  void every(unsigned long delay, bool (*cb)(void *))
+  {
+    Timer<10>::Task task = timer.every(delay, cb);
+    addProcess(cb, task);
+  }
+  void addProcess(bool (*cb)(void *), Timer<10>::Task task)
+  {
+
+    if (processes.find(cb) != processes.end())
+    {
+      debuglnV("Process already exists");
+      timer.cancel(task);
+    }
+    else
+    {
+      processes[cb] = task;
+    }
+  }
+  void remove(bool (*cb)(void *))
+  {
+    if (processes.find(cb) != processes.end())
+    {
+      timer.cancel(processes[cb]);
+      processes.erase(cb);
+    }
+  }
+
+  void start()
+  {
+    currentState = RUNNING;
+  }
+  void pause()
+  {
+    currentState = PAUSED;
+  }
+  void update()
+  {
+    if (currentState == RUNNING)
+    {
+      timer.tick();
+    }
+  }
+};
+
+ProcessManager processM;
+
+bool callGSM(void *)
+{
+
+  debuglnV("calling GSM");
+  // GsmController.doNetworkStuff(&bike); // can take some time
+  return false;
+}
+
 // debuglnV("inactive setting sleep for 1min");
 // look into deep sleep with external wake up
 // PN532 Sleep somewhere here...
 void onWakeUp()
 {
   debuglnV("Woke up from sleep");
+}
+
+bool callNFC(void *)
+{
+  debuglnV("calling NFC");
+  bool auth = NFC::isAuthorized();
+  if (NFC::success && auth)
+  {
+    // TODO setup debounce
+    bike.toggleLocked();
+  }
+
+  return false;
+}
+bool readSensor(void *)
+{
+  debuglnV("read Sensor");
+  GYRO::readSensor(&bike);
+  return false;
 }
 void setup(void)
 {
@@ -57,84 +159,20 @@ void setup(void)
   System::setup(onWakeUp);
   GPS::setup();
   NFC::setup();
+  bike.subscribe(obs);
+
+  processM.every(1000, printBike);
+  processM.every(5000, callNFC);
+  processM.every(1000, readSensor);
+  processM.every(30000, callGSM);
+  processM.start();
 }
 void loop(void)
 {
-  // if (t1.empty())
-  // {
-  //   t1.in(30000, callGSM);
-  // }
-  // if (t2.empty())
-  // {
-  //   t2.in(2000, callNFC);
-  // }
-  // if (t4.empty())
-  // {
-  //   t4.in(500, readSensor);
-  // }
-  // if (counter > 30)
-  // {
-  //   deepSleep();
-  // }
-  // t1.tick();
-  // t2.tick();
-  // t3.tick();
-  // t4.tick();
-  // IND.process();
-  // useGPS::GPSloop(bike);
+
+  GPS::GPSloop(bike);
+  processM.update();
 }
-
-// bool readSensor(void *)
-// {
-//   debuglnV("read Sensor");
-//   gyrosensor::readSensor(&bike);
-//   bike.battery = readBattery(true);
-//   if (bike.motion)
-//   {
-//     counter = 0;
-//   }
-//   else
-//   {
-//     counter++;
-//   }
-//   if (bike.locked && bike.motion)
-//   {
-//     IND.setState(3);
-//     bike.motion = false;
-//   }
-//   return true;
-// }
-
-// bool callGSM(void *)
-// {
-//   debuglnV("calling GSM");
-//   auto state = IND.getState();
-//   IND.setState(4);
-//   IND.process();
-//   GSMI.doNetworkStuff(&bike); // can take some time
-//   IND.setState(state);
-//   IND.process();
-//   // revert to prev state
-//   return true;
-// }
-
-// bool callNFC(void *)
-// {
-//   debuglnV("calling NFC");
-//   bool auth = nfcReaderpn::isAuthorized();
-//   if (auth && bike.locked)
-//   {
-//     IND.setState(2);
-//     bike.locked = false;
-//   }
-//   else if (auth && !bike.locked)
-//   {
-//     IND.setState(1);
-//     bike.locked = true;
-//   }
-//   IND.process();
-//   return true;
-// }
 
 // Additional notes
 //========================

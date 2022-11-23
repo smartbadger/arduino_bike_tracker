@@ -1,9 +1,22 @@
 {
   "files.associations": {
+    "*.json.liquid": "json",
+    "*.yaml.liquid": "yaml",
+    "*.md.liquid": "markdown",
+    "*.js.liquid": "liquid-javascript",
+    "*.css.liquid": "liquid-css",
+    "*.scss.liquid": "liquid-scss",
     "*.liquid": "liquid",
+    "*.h": "cpp",
+    "*.cpp": "cpp",
     "array": "cpp",
     "string": "cpp",
     "string_view": "cpp",
-    "arduino.h": "c"
+    "arduino.h": "c",
+    "deque": "cpp",
+    "unordered_map": "cpp",
+    "vector": "cpp",
+    "initializer_list": "cpp",
+    "*.tcc": "cpp"
   }
 }
