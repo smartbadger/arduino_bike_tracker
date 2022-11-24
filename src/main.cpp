@@ -7,10 +7,10 @@
 
 #include "modules/sensor/sensor.h"
 #include "modules/gsm_interface/gsm_interface.h"
-#include "observer.h"
 #include "modules/nfcreader/nfcreader.h"
 #include "modules/gps/gps.h"
 #include "system/system.h"
+#include "observer.h"
 
 BikeDataObservable bike;
 EventObserver obs;
@@ -29,7 +29,7 @@ using namespace GYRO;
 using namespace NFC;
 using namespace System;
 
-// GSMInterface GsmController = GSMInterface();
+GSMInterface GsmController = GSMInterface();
 typedef bool (*FuncPtrBoolInt)(void *);
 struct ProcessManager
 {
@@ -114,7 +114,7 @@ bool callGSM(void *)
 {
 
   debuglnV("calling GSM");
-  // GsmController.doNetworkStuff(&bike); // can take some time
+  GsmController.doNetworkStuff(&bike); // can take some time
   return false;
 }
 

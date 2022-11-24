@@ -1,14 +1,13 @@
 #pragma once
 
+#ifndef _GSM_H
+#define _GSM_H
 #include <MKRGSM.h>
 #include "secrets.h"
 #include "debugger.h"
 #include "config.h"
-// #include "observer.h"
+#include "observer.h"
 #include "models.h"
-
-#ifndef _GSM_H
-#define _GSM_H
 
 class GSMInterface
 {
@@ -16,7 +15,7 @@ class GSMInterface
 public:
     GSMInterface();
     ~GSMInterface();
-    void doNetworkStuff(BikeData *data);
+    void doNetworkStuff(BikeDataObservable *data);
     void setup();
     // originally in while loop with break
     // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied

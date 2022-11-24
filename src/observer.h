@@ -1,26 +1,13 @@
 #pragma once
+
+#ifndef _OBSERVER_H
+#define _OBSERVER_H
 #include <Adafruit_Sensor.h>
 #include "models.h"
 #include <string.h>
 #include <map>
 #include <vector>
-
-#ifndef _OBSERVER_H
-#define _OBSERVER_H
-
-bool sensorHasChangedWithThreshold(sensors_event_t sensor, sensors_event_t old_sensor, float threshold)
-{
-    return (abs(sensor.acceleration.x - old_sensor.acceleration.x) > threshold) ||
-           (abs(sensor.acceleration.y - old_sensor.acceleration.y) > threshold) ||
-           (abs(sensor.acceleration.z - old_sensor.acceleration.z) > threshold) ||
-           (abs(sensor.gyro.x - old_sensor.gyro.x) > threshold) ||
-           (abs(sensor.gyro.y - old_sensor.gyro.y) > threshold) ||
-           (abs(sensor.gyro.z - old_sensor.gyro.z) > threshold);
-};
-bool locationHasChangedWithThreshold(Location a, Location b, float threshold)
-{
-    return (abs(a.latitude - b.latitude) < threshold && abs(a.longitude - b.longitude) < threshold);
-}
+#include "utils.h"
 
 template <typename T>
 struct Observer
@@ -84,7 +71,8 @@ struct BikeDataObservable : public Observable<BikeDataObservable>
         this->m_bikeData.g = g;
         this->m_bikeData.a = a;
         this->m_bikeData.temp = temp;
-        if (sensorHasChangedWithThreshold(old_a, a, 1) || sensorHasChangedWithThreshold(old_g, g, 1))
+
+        if (sensorHasChangedWithThresholds(old_a, a, 1) || sensorHasChangedWithThresholds(old_g, g, 1))
             notify(MOTION_DETECTED);
     }
 
@@ -95,7 +83,7 @@ struct BikeDataObservable : public Observable<BikeDataObservable>
         this->m_bikeData.satellites = satellites;
         this->m_bikeData.speed_mph = speed_mph;
         this->m_bikeData.updated = updated;
-        if (locationHasChangedWithThreshold(old_location, location, 1))
+        if (locationHasChangedWithThresholds(old_location, location, 1))
             notify(MOTION_DETECTED);
     }
     void setGSM(bool network, String signal)
