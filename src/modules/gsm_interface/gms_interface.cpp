@@ -43,7 +43,11 @@ void GSMInterface::setup()
 
 void GSMInterface::doNetworkStuff(BikeDataObservable *data)
 {
-	if (_currentState == DISCONNECTED)
+	if (!_modemReady)
+	{
+		setup();
+	}
+	else if (_currentState == DISCONNECTED)
 	{
 		connectNetwork();
 	}
@@ -82,11 +86,26 @@ void GSMInterface::connectNetwork()
 	gprs.setTimeout(_timeout);
 	gsmAccess.setTimeout(_timeout);
 	long start = millis();
+
+	// Serial.println("Scanning available networks. May take some seconds.");
+	// Serial.println(scanner.readNetworks());
+
+	// // currently connected carrier
+	// Serial.print("Current carrier: ");
+	// Serial.println(scanner.getCurrentCarrier());
+
+	// // returns strength and ber
+	// // signal strength in 0-31 scale. 31 means power > 51dBm
+	// // BER is the Bit Error Rate. 0-7 scale. 99=not detectable
+	// Serial.print("Signal Strength: ");
+	// Serial.print(scanner.getSignalStrength());
+	// Serial.println(" [0-31]");
+
 	debuglnV("Attempting connection...");
 	// Start GSM connection
 	while (_currentState == DISCONNECTED && millis() - start < _timeout)
-	{
-		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY) & (gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY))
+	{ // && (gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY)
+		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY))
 		{
 			debuglnV("GSM: connected to the network");
 			_currentState = READY;

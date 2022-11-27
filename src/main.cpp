@@ -42,7 +42,7 @@ bool callGSM(void *)
   debuglnV("calling GSM");
   GsmController.doNetworkStuff(&bike); // can take some time
 
-  return false;
+  return true;
 }
 
 void onWakeUp()
@@ -60,13 +60,13 @@ bool callNFC(void *)
     bike.toggleLocked();
   }
 
-  return false;
+  return true;
 }
 bool readSensor(void *)
 {
   debuglnV("read Sensor");
   GYRO::readSensor(&bike);
-  return false;
+  return true;
 }
 
 //=================================================================================================
@@ -87,15 +87,15 @@ void setup(void)
   System::setup(onWakeUp);
   GPS::setup();
   NFC::setup();
-  bike.subscribe(obs);
 
-  processM.every(1000, printBike);
+  bike.subscribe(obs);
+  processM.every(120000, printBike);
   processM.every(5000, callNFC);
   processM.every(1000, readSensor);
   processM.every(30000, callGSM);
   processM.start();
 }
-void loop(void)
+void loop()
 {
 
   GPS::GPSloop(bike);

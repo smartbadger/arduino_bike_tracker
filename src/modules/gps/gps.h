@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef _GPS_H
+#define _GPS_H
+
 #include <NMEAGPS.h>
 #include "observer.h"
 #include "debugger.h"
@@ -43,6 +48,10 @@ namespace GPS
                 sat = fix.satellites;
             data.setGPS({fix.latitude(), fix.longitude(), fix.altitude_cm(), sat}, sat, fix.speed_mph(), fix.dateTime);
         }
+        else
+        {
+            debuglnV("GPS not valid");
+        }
 
     } // doSomeWork
 
@@ -71,3 +80,4 @@ namespace GPS
 
     //--------------------------
 }
+#endif

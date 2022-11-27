@@ -11,7 +11,7 @@ namespace NFC
 {
 
   Adafruit_PN532 nfcModule(PN532_IRQ, PN532_RESET);
-    uint8_t success;
+  uint8_t success;
   String readNFC()
   {
     uint8_t data[16];
