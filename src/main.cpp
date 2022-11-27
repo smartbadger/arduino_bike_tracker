@@ -1,10 +1,11 @@
 #include <Arduino.h>
-#include <arduino-timer.h>
+
 #include "models.h"
 #include "debugger.h"
 #include "config.h"
 #include <map>
 
+#include "ProcessManager.h"
 #include "modules/sensor/sensor.h"
 #include "modules/gsm_interface/gsm_interface.h"
 #include "modules/nfcreader/nfcreader.h"
@@ -18,11 +19,6 @@ int counter = 0;
 
 // TODO: implement low power, silent mode, check in frequency, and hardware removal
 // TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)
-bool printBike(void *)
-{
-  bike.print();
-  return true;
-}
 
 using namespace GPS;
 using namespace GYRO;
@@ -30,97 +26,25 @@ using namespace NFC;
 using namespace System;
 
 GSMInterface GsmController = GSMInterface();
-typedef bool (*FuncPtrBoolInt)(void *);
-struct ProcessManager
-{
-  Timer<10> timer;
-  std::map<bool (*)(void *), Timer<10>::Task> processes;
-
-  enum TaskState
-  {
-    PAUSED,
-    RUNNING,
-  };
-
-  TaskState currentState = PAUSED;
-  bool onComplete(bool (*cb)(void *))
-  {
-    debuglnV("Process Complete");
-    bool repeat = cb(nullptr);
-    if (!repeat)
-    {
-      processes.erase(cb);
-    }
-    return repeat;
-  }
-  void in(unsigned long delay, bool (*cb)(void *))
-  {
-    // q: how to cast to bool (*)(void *) to avoid compiler warning
-    Timer<10>::Task task = timer.in(delay, cb);
-    addProcess(cb, task);
-  }
-  void at(unsigned long delay, bool (*cb)(void *))
-  {
-    Timer<10>::Task task = timer.at(delay, cb);
-    addProcess(cb, task);
-  }
-  void every(unsigned long delay, bool (*cb)(void *))
-  {
-    Timer<10>::Task task = timer.every(delay, cb);
-    addProcess(cb, task);
-  }
-  void addProcess(bool (*cb)(void *), Timer<10>::Task task)
-  {
-
-    if (processes.find(cb) != processes.end())
-    {
-      debuglnV("Process already exists");
-      timer.cancel(task);
-    }
-    else
-    {
-      processes[cb] = task;
-    }
-  }
-  void remove(bool (*cb)(void *))
-  {
-    if (processes.find(cb) != processes.end())
-    {
-      timer.cancel(processes[cb]);
-      processes.erase(cb);
-    }
-  }
-
-  void start()
-  {
-    currentState = RUNNING;
-  }
-  void pause()
-  {
-    currentState = PAUSED;
-  }
-  void update()
-  {
-    if (currentState == RUNNING)
-    {
-      timer.tick();
-    }
-  }
-};
-
 ProcessManager processM;
 
+//=================================================================================================
+// Helper Functions
+//=================================================================================================
+bool printBike(void *)
+{
+  bike.print();
+  return true;
+}
 bool callGSM(void *)
 {
 
   debuglnV("calling GSM");
   GsmController.doNetworkStuff(&bike); // can take some time
+
   return false;
 }
 
-// debuglnV("inactive setting sleep for 1min");
-// look into deep sleep with external wake up
-// PN532 Sleep somewhere here...
 void onWakeUp()
 {
   debuglnV("Woke up from sleep");
@@ -144,6 +68,10 @@ bool readSensor(void *)
   GYRO::readSensor(&bike);
   return false;
 }
+
+//=================================================================================================
+// Setup and Main Loop
+//=================================================================================================
 void setup(void)
 {
   // put your setup code here, to run once:
