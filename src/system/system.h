@@ -11,7 +11,6 @@ namespace System
 {
 
     void setup(void (*callback)());
-
     void sleep();
     int setPin(int pin, bool state);
     int getPinState(int pin);

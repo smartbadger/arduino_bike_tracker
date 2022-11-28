@@ -6,27 +6,22 @@
 #include <map>
 
 #include "ProcessManager.h"
-#include "modules/sensor/sensor.h"
+#include "modules/sensor.h"
 #include "modules/gsm_interface.h"
 #include "modules/nfcreader.h"
 #include "modules/gps.h"
 #include "system/system.h"
 #include "observer.h"
 
-BikeDataObservable bike;
-EventObserver obs;
-int counter = 0;
-
-// TODO: implement low power, silent mode, check in frequency, and hardware removal
-// TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)
-
 using namespace GPS;
 using namespace GYRO;
 using namespace NFC;
 using namespace System;
 
-GSMInterface GsmController = GSMInterface();
+BikeDataObservable bike;
+EventObserver obs;
 ProcessManager processM;
+GSMInterface GsmController = GSMInterface();
 
 //=================================================================================================
 // Helper Functions
@@ -38,10 +33,7 @@ bool printBike(void *)
 }
 bool callGSM(void *)
 {
-
-  debuglnV("calling GSM");
   GsmController.doNetworkStuff(&bike); // can take some time
-
   return true;
 }
 
@@ -52,19 +44,16 @@ void onWakeUp()
 
 bool callNFC(void *)
 {
-  debuglnV("calling NFC");
   bool auth = NFC::isAuthorized();
   if (NFC::success && auth)
   {
     // TODO setup debounce
     bike.toggleLocked();
   }
-
   return true;
 }
 bool readSensor(void *)
 {
-  debuglnV("read Sensor");
   GYRO::readSensor(&bike);
   return true;
 }
@@ -129,3 +118,6 @@ void loop()
 
 // CONDITION: when bike is unlocked and idle for a set amount of time
 // lock bike
+
+// TODO: implement low power, silent mode, check in frequency, and hardware removal
+// TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)

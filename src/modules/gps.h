@@ -29,8 +29,7 @@ namespace GPS
         }
 
         debuglnV("");
-
-    } // displaySatellitesInView
+    }
     static gps_fix doSomeWork(const gps_fix &fix, BikeDataObservable &data)
     {
         //  This is the best place to do your time-consuming work, right after
@@ -43,6 +42,7 @@ namespace GPS
 
         if (fix.valid.location)
         {
+            debuglnV("GPS found");
             uint8_t sat = -1;
             if (fix.valid.satellites)
                 sat = fix.satellites;
@@ -68,13 +68,7 @@ namespace GPS
 
     void setup()
     {
-        debugV("NMEAloc.INO: started\n");
-        // debugV("fix object size = ");
-        // debuglnV(sizeof(neoGPS.fix());
-        debugV("NMEAGPS object size = ");
-        // debuglnV(sizeof(neoGPS);
         debuglnV("Looking for GPS device on " GPS_PORT_NAME);
-
         gpsPort.begin(9600);
     }
 

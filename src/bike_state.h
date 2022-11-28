@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include "StateMachine/StateMachine.h"
+#include "observer.h"
 
 class BikeEventData : public EventData
 {
@@ -72,6 +73,7 @@ namespace BikeState
     State _targetState;
     Event _currentEvent;
 
+    void eventActionHandler(Event event);
     void setState(int state);
     enum State getState();
     void processState();
@@ -84,8 +86,6 @@ namespace BikeState
     void busy();
     void error();
     void sleep();
-};
-
     // std::map<State, std::vector<std::pair<Event, State>>> _stateEventMap = {
     //     {State::INIT, {{Event::INIT_COMPLETE, State::LOCKED}}},
     //     {State::LOCKED, {{Event::MOTION_DETECTED, State::ALARM}, {Event::DETECTED_NFC, State::READING_NFC}, {Event::IDLE, State::SLEEP}}},
@@ -94,4 +94,8 @@ namespace BikeState
     //     {State::SLEEP, {{Event::WAKEUP, State::LOCKED}}},
     //     {State::UNLOCKED, {{Event::IDLE, State::LOCKED}, {Event::DETECTED_NFC, State::READING_NFC}}}};
     // ;
+};
+
+    // create observable from bikedata
+
 #endif
