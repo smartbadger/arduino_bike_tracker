@@ -101,6 +101,7 @@ struct EventObserver : Observer<BikeDataObservable>
 {
     void handleEvent(enum Event event)
     {
+
         switch (event)
         {
         case LOCK:

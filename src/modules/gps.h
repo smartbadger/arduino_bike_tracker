@@ -24,7 +24,6 @@ namespace GPS
             debugV('/');
             debugV(neoGPS.satellites[i].azimuth);
             debugV('@');
-
             debugV(", ");
         }
 

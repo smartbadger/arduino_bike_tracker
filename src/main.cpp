@@ -7,7 +7,7 @@
 
 #include "ProcessManager.h"
 #include "modules/sensor.h"
-#include "modules/gsm_interface.h"
+#include "modules/gsm_interface/gsm_interface.h"
 #include "modules/nfcreader.h"
 #include "modules/gps.h"
 #include "system/system.h"

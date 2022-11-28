@@ -18,7 +18,9 @@ enum Event
     NFC_AUTHENTICATED,
     DETECTED_NFC,
     MOTION_DETECTED,
-    // IDLE,
+    PLAY_SOUND,
+    IS_IDLE,
+    FINISHED_SOUND,
     WAKEUP,
 };
 
