@@ -5,6 +5,8 @@
 #include "debugger.h"
 #include <arduino-timer.h>
 
+// reminder: review function signatures on next lesson / casting
+bool onComplete(void *void_cb);
 struct ProcessManager
 {
     Timer<10> timer;
@@ -17,16 +19,7 @@ struct ProcessManager
     };
 
     TaskState currentState = PAUSED;
-    bool onComplete(bool (*cb)(void *))
-    {
-        debuglnV("Process Complete");
-        bool repeat = cb(nullptr);
-        if (!repeat)
-        {
-            processes.erase(cb);
-        }
-        return repeat;
-    }
+
     void in(unsigned long delay, bool (*cb)(void *))
     {
         // q: how to fix issue use of non-static member function
@@ -40,7 +33,7 @@ struct ProcessManager
     }
     void every(unsigned long delay, bool (*cb)(void *))
     {
-        Timer<10>::Task task = timer.every(delay, cb);
+        Timer<10>::Task task = timer.every(delay, onComplete, (void *)cb);
         addProcess(cb, task);
     }
     void addProcess(bool (*cb)(void *), Timer<10>::Task task)
@@ -81,4 +74,16 @@ struct ProcessManager
         }
     }
 };
+
+ProcessManager processManager;
+bool onComplete(void *void_cb)
+{
+    bool (*cb)(void *) = (bool (*)(void *))void_cb;
+    if (!cb(nullptr))
+    {
+        processManager.processes.erase(cb);
+        return false;
+    }
+    return true;
+}
 #endif

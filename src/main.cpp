@@ -12,6 +12,7 @@
 #include "modules/gps.h"
 #include "system/system.h"
 #include "observer.h"
+#include "bike_state.h"
 
 using namespace GPS;
 using namespace GYRO;
@@ -121,3 +122,4 @@ void loop()
 
 // TODO: implement low power, silent mode, check in frequency, and hardware removal
 // TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)
+
