@@ -28,7 +28,6 @@ public:
     void setGPS(Location location, int satellites, float speed_mph, char updated);
     void printBikeData();
     // Generic update method for all states
-    virtual void update();
 
     // 0 is nullptr, stating it doesn't exist yet
     // virtual void update() = 0; // TODO: must be defined in child class
@@ -43,6 +42,7 @@ public:
     virtual std::unique_ptr<State> locked();
     virtual std::unique_ptr<State> unlocked();
     virtual std::unique_ptr<State> alarm();
+    virtual std::unique_ptr<State> update() = 0;
     // TODO: print helper
 private:
     BikeData data;
@@ -54,6 +54,7 @@ class Error : public State
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> update() override;
 };
 
 class Locked : public State
@@ -65,6 +66,7 @@ public:
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> update() override;
 };
 
 class Unlocked : public State
@@ -73,14 +75,21 @@ class Unlocked : public State
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> update() override;
 };
 
 class Alarm : public State
 {
-    void update();
+public:
+    Alarm(unsigned long alarm_start);
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> update() override;
+
+    // don't forget to garud for time overflow
+private:
+    unsigned long alarm_start = 0;
 };
 
 class Sleep : public State
@@ -89,7 +98,7 @@ class Sleep : public State
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
-    std::unique_ptr<State> idle() override;
+    std::unique_ptr<State> update() override;
 };
 
 class NFCAuthenticated : public State
@@ -98,7 +107,7 @@ class NFCAuthenticated : public State
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
-    std::unique_ptr<State> idle() override;
+    std::unique_ptr<State> update() override;
 };
 
 class NFCRejected : public State
@@ -107,7 +116,7 @@ class NFCRejected : public State
     std::unique_ptr<State> nfc_authenticated() override;
     std::unique_ptr<State> nfc_rejected() override;
     std::unique_ptr<State> motion_detected() override;
-    std::unique_ptr<State> idle() override;
+    std::unique_ptr<State> update() override;
 };
 
 class NFCReading : public State

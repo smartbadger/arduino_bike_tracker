@@ -20,6 +20,7 @@ struct ProcessManager
 
     TaskState currentState = PAUSED;
 
+    // potentially review passing in state with jacob but not really necessary for this project
     void in(unsigned long delay, bool (*cb)(void *))
     {
         // q: how to fix issue use of non-static member function
@@ -78,18 +79,19 @@ struct ProcessManager
         }
     }
 };
-
+// keep this as a globa static var since its used in main.cpp
 ProcessManager processManager;
 bool onComplete(void *void_cb)
 {
     debuglnE("onComplete");
     bool (*cb)(void *) = (bool (*)(void *))void_cb;
-    if (!cb(nullptr))
-    {
-        debuglnV("Removing process");
-        processManager.remove(cb);
-        return false;
-    }
-    return true;
+    cb(nullptr);
+    // if (!cb(nullptr))
+    // {
+    debuglnV("Removing process");
+    processManager.remove(cb);
+    return false;
+    // }
+    // return true;
 }
 #endif

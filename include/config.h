@@ -17,4 +17,8 @@
 #define GSM_TIMEOUT 30000
 #define INACTIVITY_TIMEOUT 10000
 #define SLEEP_DURATION 10000
+#define ALARM_DURATION 5000 // ms
+
+// useful for keeping types consistent between different architectures
+#define BYTE uint8_t
 #endif

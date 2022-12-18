@@ -30,10 +30,7 @@ void State::setSensorData(sensors_event_t g, sensors_event_t a, float temp)
     this->data.a = a;
     this->data.temp = temp;
 };
-void State::update()
-{
-    debuglnE("State::update");
-};
+
 void State::printBikeData()
 {
 
@@ -89,6 +86,11 @@ std::unique_ptr<State> State::alarm()
 // Locked Class Implementation
 // ============================
 
+std::unique_ptr<State> Locked::update()
+{
+    // debuglnE("Locked::update");
+    return std::unique_ptr<State>(new Locked());
+};
 std::unique_ptr<State> Locked::nfc_authenticated()
 {
     debuglnE("Locked::nfc_authenticated");
@@ -113,12 +115,16 @@ std::unique_ptr<State> Locked::nfc_rejected()
 std::unique_ptr<State> Locked::motion_detected()
 {
     debuglnE("Locked::motion_detected");
-    return std::unique_ptr<State>(new Alarm());
+    return std::unique_ptr<State>(new Alarm(millis()));
 }
 
 // Unlocked Class Implementation
 // ============================
-
+std::unique_ptr<State> Unlocked::update()
+{
+    // debuglnE("Unlocked::update");
+    return std::unique_ptr<State>(new Unlocked());
+};
 std::unique_ptr<State> Unlocked::motion_detected()
 {
     debuglnE("UNLOCKED::motion_detected");
@@ -137,31 +143,49 @@ std::unique_ptr<State> Unlocked::nfc_authenticated()
 
 // Alarm Class Implementation
 // ============================
+Alarm::Alarm(unsigned long alarm_start) : alarm_start(alarm_start){
+
+                                          };
 std::unique_ptr<State> Alarm::motion_detected()
 {
     debuglnE("Alarm::motion_detected");
-    return std::unique_ptr<State>(new Alarm());
+    return std::unique_ptr<State>(new Alarm(millis()));
 }
 std::unique_ptr<State> Alarm::nfc_rejected()
 {
     debuglnE("Alarm::nfc_rejected");
-    return std::unique_ptr<State>(new Alarm());
+    return std::unique_ptr<State>(new Alarm(millis()));
 };
 std::unique_ptr<State> Alarm::nfc_authenticated()
 {
     debuglnE("Alarm::nfc_authenticated");
     return std::unique_ptr<State>(new Unlocked());
 };
-void Alarm::update()
+std::unique_ptr<State> Alarm::update()
 {
-    debuglnE("Alarm::update");
+
+    // debuglnE("Alarm::update");
     System::setAlarm(true);
     System::setRed(true);
     System::setBlink(true);
+    // don't forget to set millis for time overflow
+    if (millis() - alarm_start > ALARM_DURATION)
+    {
+        System::setAlarm(false);
+        System::setRed(false);
+        System::setBlink(false);
+        return std::unique_ptr<State>(new Locked());
+    }
+    return std::unique_ptr<State>(new Alarm(this->alarm_start));
 }
 
 // Error Class Implementation
 // ============================================
+std::unique_ptr<State> Error::update()
+{
+    // debuglnE("Error::update");
+    return std::unique_ptr<State>(new Error());
+};
 std::unique_ptr<State> Error::motion_detected()
 {
     debuglnE("Error::motion_detected");
@@ -180,6 +204,11 @@ std::unique_ptr<State> Error::nfc_authenticated()
 
 // Sleep Class Implementation
 // ============================================
+std::unique_ptr<State> Sleep::update()
+{
+    // debuglnE("Sleep::update");
+    return std::unique_ptr<State>(new Sleep());
+};
 std::unique_ptr<State> Sleep::motion_detected()
 {
     debuglnE("Sleep::motion_detected");
@@ -188,6 +217,11 @@ std::unique_ptr<State> Sleep::motion_detected()
 
 // NFCAuthenticated Class Implementation
 // ============================================
+std::unique_ptr<State> NFCAuthenticated::update()
+{
+    // debuglnE("NFCAuthenticated::update");
+    return std::unique_ptr<State>(new NFCAuthenticated());
+};
 std::unique_ptr<State> NFCAuthenticated::motion_detected()
 {
     debuglnE("NFCAuthenticated::motion_detected");
@@ -196,6 +230,11 @@ std::unique_ptr<State> NFCAuthenticated::motion_detected()
 
 // NFCRejected Class Implementation
 // ============================================
+std::unique_ptr<State> NFCRejected::update()
+{
+    // debuglnE("NFCRejected::update");
+    return std::unique_ptr<State>(new NFCRejected());
+};
 std::unique_ptr<State> NFCRejected::motion_detected()
 {
     debuglnE("NFCRejected::motion_detected");

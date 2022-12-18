@@ -19,7 +19,6 @@ using namespace GYRO;
 using namespace NFC;
 using namespace System;
 
-ProcessManager processM;
 GSMInterface GsmController = GSMInterface();
 
 std::unique_ptr<State> state(new Locked()); // State *state = new Locked(); <-- similar but not as safe
@@ -94,25 +93,25 @@ void setup(void)
   GPS::setup();
   NFC::setup();
 
-  processM.every(120000, printBike);
-  processM.every(5000, callNFC);
-  processM.every(1000, readSensor);
-  // processM.every(30000, callGSM);
-  processM.start();
+  // processManager.every(120000, printBike);
+  // processManager.every(5000, callNFC);
+  // processManager.every(1000, readSensor);
+  // processManager.every(30000, callGSM);
+  processManager.start();
 }
 
 void loop()
 {
 
   // this doesn't seem to work
-  // processM.in(120000, printBike);
-  // processM.in(5000, callNFC);
-  // processM.in(1000, readSensor);
-  // processM.in(30000, callGSM);
+  processManager.in(120000, printBike);
+  processManager.in(5000, callNFC);
+  processManager.in(1000, readSensor);
+  processManager.in(30000, callGSM);
 
   GPS::GPSloop(*state);
-  processM.update();
-  // state->update();
+  processManager.update();
+  state = state->update();
 }
 
 // TODO: implement low power, silent mode, check in frequency, and hardware removal
