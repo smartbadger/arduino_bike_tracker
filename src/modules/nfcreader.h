@@ -7,6 +7,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_PN532.h>
+
 namespace NFC
 {
 
@@ -24,7 +25,8 @@ namespace NFC
     success = nfcModule.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength, 1500);
     if (success && uidLength == 4)
     {
-      // TODO: update state
+
+      // TODO: update state -> state.nfc_detected();
       debuglnV("Found an ISO14443A card, Trying to authenticate block 4 with default KEYA value");
       if (nfcModule.mifareclassic_AuthenticateBlock(uid, uidLength, 4, 0, keya))
       {

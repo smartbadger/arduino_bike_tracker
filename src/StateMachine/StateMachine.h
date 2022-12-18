@@ -9,143 +9,110 @@
 #include <string.h>
 #include <map>
 #include <vector>
-#include "observer.h"
 #include "models.h"
 #include <memory>
 #include <utility>
-// namespace BikeState
-// {
-//     enum State
-//     {
-//         INIT,
-//         LOCKED,
-//         IDLE,
-//         ALARM,
-//         UNLOCKED,
-//         READING_NFC,
-//         NFC_AUTHENTICATED,
-//         NFC_REJECTED,
-//         SLEEP,
-//         PLAYING_SOUND,
-//         MAX_STATES
-//     };
-//     State _currentState;
-//     State _previousState;
-//     State _targetState;
-//     Event _currentEvent;
+#include "debugger.h"
+#include "models.h"
+#include "modules/System/System.h"
 
-//     void eventActionHandler(Event event);
-//     void setState(int state);
-//     enum State getState();
-//     void update();
+class Error;
 
-//     void goToSleep();
-//     void goToLock();
-//     void goToUnlock();
-//     void goToAlarm();
-//     void goToPlayingSound();
-//     void goToReadingNFC();
-//     void goToNFCAuthenticated();
-//     void goToNFCRejected();
-//     void goToIdle();
-
-//     std::map<State, std::vector<std::pair<Event, voidFuncPtr>>> _stateEventMap = {
-//         {State::INIT, {{Event::INIT_COMPLETE, goToLock}}},
-//         {State::LOCKED, {{Event::MOTION_DETECTED, goToAlarm}, {Event::DETECTED_NFC, goToReadingNFC}, {Event::IS_IDLE, goToSleep}, {Event::PLAY_SOUND, goToPlayingSound}}},
-//         {State::ALARM, {{Event::FINISHED_SOUND, goToLock}, {Event::DETECTED_NFC, goToReadingNFC}}},
-//         {State::READING_NFC, {{Event::NFC_REJECTED, goToNFCAuthenticated}, {Event::NFC_AUTHENTICATED, goToNFCRejected}}},
-//         {State::PLAYING_SOUND, {{Event::FINISHED_SOUND, goToLock}, {Event::DETECTED_NFC, goToReadingNFC}}},
-//         {State::NFC_AUTHENTICATED, {{Event::LOCK, goToLock}, {Event::UNLOCK, goToUnlock}}},
-//         {State::NFC_REJECTED, {{Event::LOCK, goToLock}}},
-//         {State::SLEEP, {{Event::WAKEUP, goToLock}}},
-//         {State::UNLOCKED, {{Event::IS_IDLE, goToLock}, {Event::DETECTED_NFC, goToReadingNFC}, {Event::PLAY_SOUND, goToPlayingSound}}}};
-
-// };
-class State {
-    public:
-        virtual void onEnter();
-        virtual void onExit();
-        virtual void update();
-        virtual void eventActionHandler(Event event);
-        virtual void setState(int state);
-        virtual State getState();
-        virtual void goToSleep();
-        virtual void goToLock();
-        virtual void goToUnlock();
-        virtual void goToAlarm();
-        virtual void goToPlayingSound();
-        virtual void goToReadingNFC();
-        virtual void goToNFCAuthenticated();
-        virtual void goToNFCRejected();
-        virtual void goToIdle();
-};
-};
-class Error : public State
-{
-};
 class State
 {
-
+public:
     virtual ~State();
-    virtual std::unique_ptr<State> motion_detected()
-    {
-        return std::unique_ptr(Error());
-    };
+    const BikeData &getBikeData() const; // const prevents modification of the object
+    void setSensorData(sensors_event_t g, sensors_event_t a, float temp);
+    void setGSM(bool network, String signal);
+    void setGPS(Location location, int satellites, float speed_mph, char updated);
+    void printBikeData();
+    // Generic update method for all states
+    virtual void update();
 
-    virtual std::unique_ptr<State> detected_nfc()
-    {
-        return std::unique_ptr(Error());
-    };
+    // 0 is nullptr, stating it doesn't exist yet
+    // virtual void update() = 0; // TODO: must be defined in child class
 
-    virtual std::unique_ptr<State> nfc_authenticated()
-    {
-        return std::unique_ptr(Error());
-    };
+    // These are the transitions
+    //==========================================================================
+    virtual std::unique_ptr<State> motion_detected();
+    virtual std::unique_ptr<State> nfc_authenticated();
+    virtual std::unique_ptr<State> sleep();
+    virtual std::unique_ptr<State> nfc_rejected();
+    virtual std::unique_ptr<State> idle();
+    virtual std::unique_ptr<State> locked();
+    virtual std::unique_ptr<State> unlocked();
+    virtual std::unique_ptr<State> alarm();
+    // TODO: print helper
+private:
+    BikeData data;
 };
 
-// class Locked : public State
-// {
-//     unique_ptr<State> motion_detected() override
-//     {
-//         turnOffRed();
-//         turnOnGreen();
+class Error : public State
+{
+    // void update() override;
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+};
 
-//         return unique_ptr(Alarm());
-//     }
-// };
+class Locked : public State
+{
+    // void update() override;
 
-// class Alarm : public State
-// {
-// public:
-//     Alarm()
-//     {
-//         // pin turn on
-//     }
+public:
+    // use override to have compiler complain if you don't override the method
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+};
 
-//     unique_ptr<State> nfc_authenticated() override
-//     {
-//         return unique_ptr(Unlocked());
-//     }
+class Unlocked : public State
+{
+    // void update() override;
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+};
 
-//     ~Alarm()
-//     {
-//         // pin turn off
-//     }
+class Alarm : public State
+{
+    void update();
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+};
 
-// private:
-//     AlarmSound alarm_on;
-// };
+class Sleep : public State
+{
+    // void update() override;
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> idle() override;
+};
 
-// class Error : public State
-// {
-// };
+class NFCAuthenticated : public State
+{
+    // void update() override;
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> idle() override;
+};
 
-// int main()
-// {
-//     unique_ptr<State> state(Locked());
-//     while (true)
-//     {
-//         state = state.detected_nfc();
-//     }
-// }
+class NFCRejected : public State
+{
+    // void update() override;
+    std::unique_ptr<State> nfc_authenticated() override;
+    std::unique_ptr<State> nfc_rejected() override;
+    std::unique_ptr<State> motion_detected() override;
+    std::unique_ptr<State> idle() override;
+};
+
+class NFCReading : public State
+{
+    // void update() override;
+};
+
 #endif

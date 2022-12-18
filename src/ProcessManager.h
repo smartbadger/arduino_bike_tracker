@@ -23,12 +23,12 @@ struct ProcessManager
     void in(unsigned long delay, bool (*cb)(void *))
     {
         // q: how to fix issue use of non-static member function
-        Timer<10>::Task task = timer.in(delay, cb);
+        Timer<10>::Task task = timer.in(delay, onComplete, (void *)cb);
         addProcess(cb, task);
     }
     void at(unsigned long delay, bool (*cb)(void *))
     {
-        Timer<10>::Task task = timer.at(delay, cb);
+        Timer<10>::Task task = timer.at(delay, onComplete, (void *)cb);
         addProcess(cb, task);
     }
     void every(unsigned long delay, bool (*cb)(void *))
@@ -41,18 +41,21 @@ struct ProcessManager
 
         if (processes.find(cb) != processes.end())
         {
-            debuglnV("Process already exists");
+            // debuglnV("Process already exists");
             timer.cancel(task);
         }
         else
         {
+            debuglnV("Adding process");
             processes[cb] = task;
         }
     }
+    // TODO: this isn't properly removing
     void remove(bool (*cb)(void *))
     {
         if (processes.find(cb) != processes.end())
         {
+
             timer.cancel(processes[cb]);
             processes.erase(cb);
         }
@@ -70,6 +73,7 @@ struct ProcessManager
     {
         if (currentState == RUNNING)
         {
+            // Serial.print(processes.size());
             timer.tick();
         }
     }
@@ -78,10 +82,12 @@ struct ProcessManager
 ProcessManager processManager;
 bool onComplete(void *void_cb)
 {
+    debuglnE("onComplete");
     bool (*cb)(void *) = (bool (*)(void *))void_cb;
     if (!cb(nullptr))
     {
-        processManager.processes.erase(cb);
+        debuglnV("Removing process");
+        processManager.remove(cb);
         return false;
     }
     return true;

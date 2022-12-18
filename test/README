@@ -1,4 +1,3 @@
-
 This directory is intended for PlatformIO Unit Testing and project tests.
 
 Unit Testing is a software testing method by which individual units of
@@ -8,4 +7,14 @@ determine whether they are fit for use. Unit testing finds problems early
 in the development cycle.
 
 More information about PlatformIO Unit Testing:
+
 - https://docs.platformio.org/page/plus/unit-testing.html
+
+### review g++, maybe clang again
+
+### -Wpedantic arg on compiler
+
+### additional test libraries
+
+- c++ 'catch' or 'catch2' for unit testing
+- boost

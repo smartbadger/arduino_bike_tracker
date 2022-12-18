@@ -4,9 +4,9 @@
 #define _GPS_H
 
 #include <NMEAGPS.h>
-#include "observer.h"
 #include "debugger.h"
 #include <GPSport.h>
+#include "StateMachine/StateMachine.h"
 namespace GPS
 {
     static NMEAGPS neoGPS; // This parses the GPS characters
@@ -29,7 +29,7 @@ namespace GPS
 
         debuglnV("");
     }
-    static gps_fix doSomeWork(const gps_fix &fix, BikeDataObservable &data)
+    static gps_fix doSomeWork(const gps_fix &fix, State &state)
     {
         //  This is the best place to do your time-consuming work, right after
         //     the RMC sentence was received.  If you do anything in "loop()",
@@ -44,8 +44,10 @@ namespace GPS
             debuglnV("GPS found");
             uint8_t sat = -1;
             if (fix.valid.satellites)
+            {
                 sat = fix.satellites;
-            data.setGPS({fix.latitude(), fix.longitude(), fix.altitude_cm(), sat}, sat, fix.speed_mph(), fix.dateTime);
+            }
+            state.setGPS({fix.latitude(), fix.longitude(), fix.altitude_cm(), sat}, sat, fix.speed_mph(), fix.dateTime);
         }
         else
         {
@@ -56,7 +58,7 @@ namespace GPS
 
     //------------------------------------
 
-    static void GPSloop(BikeDataObservable &data)
+    static void GPSloop(State &data)
     {
         while (neoGPS.available(gpsPort))
             doSomeWork(neoGPS.read(), data);

@@ -10,32 +10,35 @@
 #include "modules/gsm_interface/gsm_interface.h"
 #include "modules/nfcreader.h"
 #include "modules/gps.h"
-#include "system/system.h"
-#include "observer.h"
-#include "bike_state.h"
+#include "utils.h"
+#include "StateMachine/StateMachine.h"
+#include <memory>
 
 using namespace GPS;
 using namespace GYRO;
 using namespace NFC;
 using namespace System;
 
-BikeDataObservable bike;
-EventObserver obs;
 ProcessManager processM;
 GSMInterface GsmController = GSMInterface();
+
+std::unique_ptr<State> state(new Locked()); // State *state = new Locked(); <-- similar but not as safe
 
 //=================================================================================================
 // Helper Functions
 //=================================================================================================
 bool printBike(void *)
 {
-  bike.print();
+  BikeData data = state->getBikeData();
+  state->printBikeData();
   return true;
+  // return false;
 }
 bool callGSM(void *)
 {
-  GsmController.doNetworkStuff(&bike); // can take some time
+  GsmController.doNetworkStuff(); // can take some time
   return true;
+  // return false;
 }
 
 void onWakeUp()
@@ -48,15 +51,28 @@ bool callNFC(void *)
   bool auth = NFC::isAuthorized();
   if (NFC::success && auth)
   {
-    // TODO setup debounce
-    bike.toggleLocked();
+    // TODO: setup debounce
+    state = state->nfc_authenticated();
+  }
+  else if (NFC::success && !auth)
+  {
+    state = state->nfc_rejected();
   }
   return true;
+  // return false;
 }
 bool readSensor(void *)
 {
-  GYRO::readSensor(&bike);
+  BikeData oldData = state->getBikeData();
+  GYRO::readSensor(*state);
+  const BikeData &newData = state->getBikeData(); // at runtime don't keep copying
+  if (sensorHasChangedWithThresholds(oldData.g, newData.g, 1) || sensorHasChangedWithThresholds(oldData.a, newData.a, 1))
+  {
+    state = state->motion_detected();
+  }
+
   return true;
+  // return false;
 }
 
 //=================================================================================================
@@ -78,48 +94,26 @@ void setup(void)
   GPS::setup();
   NFC::setup();
 
-  bike.subscribe(obs);
   processM.every(120000, printBike);
   processM.every(5000, callNFC);
   processM.every(1000, readSensor);
-  processM.every(30000, callGSM);
+  // processM.every(30000, callGSM);
   processM.start();
 }
+
 void loop()
 {
 
-  GPS::GPSloop(bike);
+  // this doesn't seem to work
+  // processM.in(120000, printBike);
+  // processM.in(5000, callNFC);
+  // processM.in(1000, readSensor);
+  // processM.in(30000, callGSM);
+
+  GPS::GPSloop(*state);
   processM.update();
+  // state->update();
 }
-
-// Additional notes
-//========================
-
-// CONDITION: when bike is unlocked and moving
-
-// GSM call frequency low
-// NFC calls call frequency very low
-// sensor call frequency low
-
-// CONDITION: when bike is locked not moving
-// GSM call frequency very low
-// NFC calls call frequency very low
-// sensor call frequency medium
-
-// CONDITION: when bike is locked and moving
-// GSM call frequency high
-// NFC calls call frequency low
-// sensor call frequency medium/low
-// alarm call medium/high
-
-// CONDITION: when bike is locked and moving low battery
-// GSM call frequency low / sleep
-// NFC calls call frequency very low / sleep
-// sensor call frequency very low / sleep
-
-// CONDITION: when bike is unlocked and idle for a set amount of time
-// lock bike
 
 // TODO: implement low power, silent mode, check in frequency, and hardware removal
 // TODO: add watchdog for reset, (ideally make a countdown that needs to be refreshed incase code fails)
-

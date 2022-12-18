@@ -41,7 +41,7 @@ void GSMInterface::setup()
 	}
 }
 
-void GSMInterface::doNetworkStuff(BikeDataObservable *data)
+void GSMInterface::doNetworkStuff()
 {
 	if (!_modemReady)
 	{
@@ -55,7 +55,7 @@ void GSMInterface::doNetworkStuff(BikeDataObservable *data)
 	{
 		// data->location = measureLocation();
 
-		data->setGSM(false, getNetworkStatus());
+		// data->setGSM(false, getNetworkStatus());
 	}
 }
 

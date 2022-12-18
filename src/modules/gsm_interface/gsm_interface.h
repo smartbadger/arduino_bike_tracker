@@ -6,7 +6,7 @@
 #include "secrets.h"
 #include "debugger.h"
 #include "config.h"
-#include "observer.h"
+#include "StateMachine/StateMachine.h"
 #include "models.h"
 
 class GSMInterface
@@ -15,7 +15,7 @@ class GSMInterface
 public:
     GSMInterface();
     ~GSMInterface();
-    void doNetworkStuff(BikeDataObservable *data);
+    void doNetworkStuff();
     void setup();
     // originally in while loop with break
     // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied

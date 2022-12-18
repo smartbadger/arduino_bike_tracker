@@ -4,57 +4,59 @@
 
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
-#include "observer.h"
 
 #include <Wire.h>
 #include "sensor.h"
 #include "debugger.h"
+#include "StateMachine/StateMachine.h"
 
 namespace GYRO
 {
-    Adafruit_MPU6050 _mpu;
-    boolean _ready = false;
+    Adafruit_MPU6050 mpu;
+    boolean ready = false;
     void sleep(boolean sleep)
     {
-        _mpu.enableSleep(sleep);
+        mpu.enableSleep(sleep);
     }
     void setup()
     {
-        // Try to initialize!
-        if (!_mpu.begin())
+        if (!mpu.begin())
         {
-            _ready = false;
+            ready = false;
             debuglnV("MPU6050 not Found!");
             return;
         };
 
         debuglnV("MPU6050 Found!");
-        _ready = true;
+        ready = true;
 
         // setup motion detection
-        _mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
-        _mpu.setMotionDetectionThreshold(1);
-        _mpu.setMotionDetectionDuration(20);
-        _mpu.setInterruptPinLatch(true); // Keep it latched.  Will turn off when reinitialized.
-        _mpu.setInterruptPinPolarity(true);
-        _mpu.setMotionInterrupt(true);
+        mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
+        mpu.setMotionDetectionThreshold(1); // TODO: There is actually a threshold built in... Do we need the other changed function?
+        mpu.setMotionDetectionDuration(20);
+        mpu.setInterruptPinLatch(true); // Keep it latched.  Will turn off when reinitialized.
+        mpu.setInterruptPinPolarity(true);
+        mpu.setMotionInterrupt(true);
     }
-    bool readSensor(BikeDataObservable *data)
+
+    // * is a pointer to the bike data and & is a reference to the bike data
+    bool readSensor(State &state)
     {
-        if (!_ready)
+        if (!ready)
         {
             setup();
             return false;
         }
         sensors_event_t a, g, temp;
-        if (_mpu.getMotionInterruptStatus())
+        if (mpu.getMotionInterruptStatus())
         {
             /* Get new sensor events with the readings */
-            _mpu.getEvent(&a, &g, &temp);
-            data->setGyro(g, a, temp.temperature);
+            // within an expression * dereferences a pointer & takes the address of a variable
+            mpu.getEvent(&a, &g, &temp);
+            state.setSensorData(g, a, temp.temperature);
         }
 
         return false;
-    }
+    };
 }
 #endif
