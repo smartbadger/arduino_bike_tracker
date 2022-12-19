@@ -38,11 +38,13 @@ namespace GPS
         //  For this example, we just print the lat/lon.  If you print too much,
         //     this routine will not get back to "loop()" in time to process
         //     the next set of GPS data.
-
+        displaySatellitesInView();
         if (fix.valid.location)
         {
+
             debuglnV("GPS found");
             uint8_t sat = -1;
+
             if (fix.valid.satellites)
             {
                 sat = fix.satellites;
@@ -61,7 +63,10 @@ namespace GPS
     static void GPSloop(State &data)
     {
         while (neoGPS.available(gpsPort))
+        {
+
             doSomeWork(neoGPS.read(), data);
+        }
 
     } // GPSloop
 

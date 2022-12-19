@@ -26,6 +26,7 @@ std::unique_ptr<State> state(new Locked()); // State *state = new Locked(); <-- 
 //=================================================================================================
 // Helper Functions
 //=================================================================================================
+// consider making these void since they don't repeat like they should
 bool printBike(void *)
 {
   BikeData data = state->getBikeData();
@@ -35,7 +36,7 @@ bool printBike(void *)
 }
 bool callGSM(void *)
 {
-  GsmController.doNetworkStuff(); // can take some time
+  GsmController.doNetworkStuff(*state); // can take some time
   return true;
   // return false;
 }
@@ -104,10 +105,10 @@ void loop()
 {
 
   // this doesn't seem to work
-  processManager.in(120000, printBike);
+  processManager.in(5000, printBike);
   processManager.in(5000, callNFC);
   processManager.in(1000, readSensor);
-  processManager.in(30000, callGSM);
+  // processManager.in(1000, callGSM);
 
   GPS::GPSloop(*state);
   processManager.update();

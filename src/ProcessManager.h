@@ -83,12 +83,10 @@ struct ProcessManager
 ProcessManager processManager;
 bool onComplete(void *void_cb)
 {
-    debuglnE("onComplete");
     bool (*cb)(void *) = (bool (*)(void *))void_cb;
     cb(nullptr);
     // if (!cb(nullptr))
     // {
-    debuglnV("Removing process");
     processManager.remove(cb);
     return false;
     // }

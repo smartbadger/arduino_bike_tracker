@@ -15,23 +15,24 @@ class GSMInterface
 public:
     GSMInterface();
     ~GSMInterface();
-    void doNetworkStuff();
+    void doNetworkStuff(State &state);
     void setup();
     // originally in while loop with break
     // This function use the location's APIs to get the device coordinates and update the global variable if all the requirement are satisfied
     // send json data to endpoint
 
 private:
-    enum State
+    enum GSMState
     {
         DISCONNECTED,
+        CONNECTING,
         READY,
         IDLE,
         SLEEP,
         SENDING,
         RECEIVING,
     };
-    State _currentState;
+    GSMState _currentState;
     GPRS gprs;
     GSM gsmAccess;
     GSM_SMS sms;

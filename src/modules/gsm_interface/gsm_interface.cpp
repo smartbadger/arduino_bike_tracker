@@ -9,7 +9,7 @@ static const int _SERVER_PORT = SERVER_PORT;
 
 GSMInterface::GSMInterface()
 {
-	State _currentState = DISCONNECTED;
+	_currentState = DISCONNECTED;
 	_timeout = GSM_TIMEOUT;
 	_connected = false;
 	_expired = false;
@@ -23,6 +23,8 @@ GSMInterface::~GSMInterface()
 
 void GSMInterface::setup()
 {
+	_modemReady = true;
+	return;
 	debuglnV("Setting up GSM Interface");
 	long start = millis();
 	while (!_modemReady && millis() - start < _timeout)
@@ -41,11 +43,43 @@ void GSMInterface::setup()
 	}
 }
 
-void GSMInterface::doNetworkStuff()
+void GSMInterface::doNetworkStuff(State &state)
 {
 	if (!_modemReady)
 	{
 		setup();
+	}
+	else if (_currentState == CONNECTING)
+	{
+		if (gsmAccess.ready() == 1)
+		{
+			debuglnV("GSM: connected to the network");
+			_currentState = READY;
+			_connected = true;
+		}
+		// else if (gsmAccess.ready() >= 2)
+		// {
+		// 	debuglnV("GSM: not connected to the network");
+		// 	_currentState = DISCONNECTED;
+		// 	_connected = false;
+		// }
+		else
+		{
+			debuglnV("GSM: trying to connect to the network");
+			// Serial.println("Scanning available networks. May take some seconds.");
+			// Serial.println(scanner.readNetworks());
+
+			// // currently connected carrier
+			Serial.print("Current carrier: ");
+			Serial.print(scanner.getCurrentCarrier());
+
+			// // returns strength and ber
+			// // signal strength in 0-31 scale. 31 means power > 51dBm
+			// // BER is the Bit Error Rate. 0-7 scale. 99=not detectable
+			Serial.print("Signal Strength: ");
+			Serial.print(scanner.getSignalStrength());
+			Serial.println(" [0-31]");
+		}
 	}
 	else if (_currentState == DISCONNECTED)
 	{
@@ -53,9 +87,8 @@ void GSMInterface::doNetworkStuff()
 	}
 	else if (_currentState == READY)
 	{
-		// data->location = measureLocation();
-
-		// data->setGSM(false, getNetworkStatus());
+		measureLocation();
+		state.setGSM(false, getNetworkStatus());
 	}
 }
 
@@ -83,45 +116,17 @@ void GSMInterface::connectNetwork()
 {
 	// set global AT command timeout this allow to recover from uart communication
 	//  freeze between samd module and ublox module.
-	gprs.setTimeout(_timeout);
-	gsmAccess.setTimeout(_timeout);
-	long start = millis();
-
-	// Serial.println("Scanning available networks. May take some seconds.");
-	// Serial.println(scanner.readNetworks());
-
-	// // currently connected carrier
-	// Serial.print("Current carrier: ");
-	// Serial.println(scanner.getCurrentCarrier());
-
-	// // returns strength and ber
-	// // signal strength in 0-31 scale. 31 means power > 51dBm
-	// // BER is the Bit Error Rate. 0-7 scale. 99=not detectable
-	// Serial.print("Signal Strength: ");
-	// Serial.print(scanner.getSignalStrength());
-	// Serial.println(" [0-31]");
+	// gprs.setTimeout(_timeout);
+	// gsmAccess.setTimeout(_timeout);
+	// long start = millis();
 
 	debuglnV("Attempting connection...");
-	// Start GSM connection
-	while (_currentState == DISCONNECTED && millis() - start < _timeout)
-	{ // && (gprs.attachGPRS(_GPRS_APN, _GPRS_LOGIN, _GPRS_PASSWORD) == GPRS_READY)
-		if ((gsmAccess.begin(_PINNUMBER) == GSM_READY))
-		{
-			debuglnV("GSM: connected to the network");
-			_currentState = READY;
-			_connected = true;
-			break;
-		}
-		else
-		{
-			debuglnV("GSM: failed to connect");
-		}
-	}
+	gsmAccess.begin(_PINNUMBER, true, false) &&
+		gprs.attachGPRS(SECRET_APN, SECRET_LOGIN, SECRET_PASS);
+	_currentState = CONNECTING;
 }
 String GSMInterface::getNetworkStatus()
 {
-	// debuglnV(scanner.readNetworks());
-	// scanner.getCurrentCarrier();
 	return scanner.getSignalStrength();
 }
 void GSMInterface::setExpired(boolean value)
